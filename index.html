@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compare plans for your home | Origin Energy</title>
+<style>
+@font-face{font-family:gordita;src:url('project/fonts/gorditaregular-webfont.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:gordita;src:url('project/fonts/gorditamedium-webfont.woff2') format('woff2');font-weight:500 600;font-display:swap}
+@font-face{font-family:gordita;src:url('project/fonts/gorditabold-webfont.woff2') format('woff2');font-weight:700;font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#fff;font-family:gordita,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#232323;font-size:15px;line-height:22px}
+cp-icon{display:inline-flex;line-height:0}
+img,svg,cp-icon{-webkit-user-drag:none;user-drag:none;-webkit-user-select:none;user-select:none}
+a{color:#232323}
+button{font-family:inherit}
+.t13{font-size:13px;line-height:20px}
+.t15{font-size:15px;line-height:22px}
+.t17{font-size:17px;line-height:24px}
+.t28{font-size:28px;line-height:34px}
+.mut{color:#909090}.mid{color:#505050}
+.grn{color:#0E7B3D;font-weight:600}
+.cp-link{text-decoration:underline dotted;text-decoration-color:#C4C4C4;text-decoration-thickness:1.4px;text-underline-offset:3px;cursor:pointer;transition:color .15s ease}
+.cp-link:hover{color:#1A73E8 !important}
+.qlink{border:0;background:none;padding:8px 4px;font-weight:600;cursor:pointer;color:#232323;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px;text-decoration-color:#C9C9C9}
+.qlink:hover{text-decoration-color:#232323}
+.cta{border:0;background:#FFB233;border-radius:26px;min-height:52px;font-weight:600;color:#232323;cursor:pointer;padding:0 28px}
+.cta:hover{background:#f5a91c}
+.pcard{width:100%;text-align:left;background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:20px;cursor:pointer;display:block;transition:border-color .15s ease;animation:rise .4s cubic-bezier(.22,.61,.36,1) both}
+.pcard:hover{border-color:#232323}
+.q-opt{width:100%;min-height:56px;background:#fff;border:1.5px solid #C9C9C9;border-radius:16px;padding:14px 18px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;transition:border-color .15s}
+.q-opt:hover{border-color:#232323}
+.q-opt.on{border-color:#232323;background:#232323;color:#fff}
+.q-opt:disabled{cursor:default;border-color:#EAEAEA;background:#FAFAFA;color:#B5B5B5}
+.q-opt:disabled:hover{border-color:#EAEAEA}
+.rcard{scroll-snap-align:start;flex-shrink:0;background:#fff;border:1.5px solid #E6E6E6;border-radius:24px;padding:26px 18px;display:flex;flex-direction:column;gap:20px;animation:rise .4s cubic-bezier(.22,.61,.36,1) both}
+.car-row{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 16px;scrollbar-width:none}
+.car-row::-webkit-scrollbar{display:none}
+.car-btn{width:40px;height:40px;border-radius:50%;border:1px solid #D8D8D8;background:#fff;color:#232323;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.car-btn:hover{border-color:#232323}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;font-size:14px;color:#232323;user-select:none}
+.chk .box{width:20px;height:20px;border-radius:4px;border:1.5px solid #737373;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s}
+.chk.on .box{background:#FF6024;border-color:#FF6024}
+.cp-input::placeholder{color:#909090;font-weight:700;opacity:1}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cpFade{from{opacity:0}to{opacity:1}}
+@keyframes cpFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes cpPop{0%{transform:scale(0)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes cpSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes cpSlideDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+@keyframes cpModalIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes cpModalOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(16px) scale(.98)}}
+</style>
+<link rel="preload" as="image" href="project/assets/everyday-rewards.png">
+<link rel="preload" as="image" href="project/assets/pictogram-offer.svg">
+<link rel="preload" as="image" href="project/assets/pictogram-bolt.svg">
+<link rel="preload" as="image" href="project/assets/pictogram-solar.svg">
+<link rel="preload" as="image" href="project/assets/pictogram-battery.svg">
+<link rel="preload" as="image" href="project/assets/pictogram-night.svg">
+<script src="project/components/cp-icon.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<div id="sheet-layer"></div>
+<div id="modal-layer"></div>
+<script>
+(function(){
+'use strict';
+
+/* ── Plan data (shared with the other variants) ─────────────── */
+const CAL={icon:'Calendar',text:'Variable rates with ongoing benefit period',modal:'variable'};
+const GP={icon:'GreenPower',text:'100% GreenPower electricity',modal:'greenpower'};
+const EVP={icon:'EVPowerup',text:'8c/kWh EV charging for compatible vehicles',modal:'ev'};
+
+const BASE_PLANS=[
+  {id:'go',name:'Origin Go Variable',tagline:'For homes who want everyday low prices.',
+   benefit:'Everyday low rates, no surprises',
+   discount:'8',ref:'$2,411',yearly:'$2,218',gasYearly:'$1,386',
+   rates:{supply:'103c/day',peak:'53.8c/kWh',special:null,fit:'5c/kWh'},
+   included:[{icon:'Promo',text:'Everyday low variable electricity rates',modal:'goVar'},CAL],
+   addable:[GP,EVP]},
+  {id:'edr',name:'Origin Everyday Rewards Variable',tagline:'Save on your next shop by earning Everyday Rewards points.',
+   benefit:'Turn your bills into Everyday Rewards points',
+   tag:'Most popular',tagColor:'#D44500',
+   discount:'4',ref:'$2,411',yearly:'$2,314',gasYearly:'$1,494',
+   rates:{supply:'103c/day',peak:'56.2c/kWh',special:null,fit:'5c/kWh'},
+   included:[{icon:'BoxedReward',text:'Earn up to 10,000 Everyday Rewards Points',modal:'edr'},CAL],
+   addable:[GP,EVP]},
+  {id:'wd',name:'Origin Weekday Shift',tagline:'Off-peak electricity rates on weekdays, 9am–5pm.',
+   benefit:'Half-price power on weekday days',
+   discount:'17',ref:'$2,411',yearly:'$1,995',gasYearly:'$2,218',
+   rates:{supply:'103c/day',peak:'58.9c/kWh',special:{label:'Weekdays 9am–5pm',value:'29.5c/kWh'},fit:'5c/kWh'},
+   included:[{icon:'TOU',text:'Half price electricity weekdays 9am–5pm',modal:'weekday'},CAL],
+   addable:[GP]}
+];
+const ADDON_PLANS={
+  Solar:{id:'solar',name:'Origin Solar Boost',tagline:'Get more from your solar panels with a boosted FIT.',
+    benefit:'Get paid more for your solar exports',
+    discount:'0',ref:'$2,411',yearly:'$2,411',gasYearly:'$2,218',
+    rates:{supply:'103c/day',peak:'57.4c/kWh',special:null,fit:'up to 8c/kWh'},
+    included:[{icon:'Solar',text:'Get a boosted FIT for your solar generation',modal:'solar'},CAL],
+    addable:[GP,EVP]},
+  EV:{id:'night',name:'Origin Night Shift',tagline:'Off-peak electricity rates for charging your EV overnight.',
+    benefit:'Charge your EV overnight from $5',
+    tag:'Bring any EV',tagColor:'#FF6024',
+    discount:'1',ref:'$2,411',yearly:'$2,377',gasYearly:'$2,218',
+    rates:{supply:'103c/day',peak:'55.1c/kWh',special:{label:'Overnight 12am–6am',value:'8c/kWh'},fit:'5c/kWh'},
+    included:[{icon:'EVCharge',text:'Fully charge your EV from $5 with 8c/kWh overnight',modal:'night'},CAL],
+    addable:[GP]},
+  Battery:{id:'battery',name:'Origin Battery IQ',tagline:'Power your home with 4 free hours of power a day.',
+    benefit:'4 free hours of power every day',
+    tag:'Just launched',tagColor:'#FF6024',
+    discount:'10',ref:'$2,411',yearly:'$1,497',gasYearly:'$2,218',
+    rates:{supply:'103c/day',peak:'54.9c/kWh',special:{label:'Daily 11am–2pm',value:'0c/kWh'},fit:'33c/kWh 6–9pm'},
+    included:[{icon:'Bolt',text:'4 hours of 0c/kWh rates a day plus a higher evening FIT',modal:'battery'},CAL],
+    addable:[GP]}
+};
+const ALL_PLANS=[...BASE_PLANS,ADDON_PLANS.Solar,ADDON_PLANS.EV,ADDON_PLANS.Battery];
+const GAS_RATES={supply:'81.4c/day',usage:'4.62c/MJ (0–30 MJ/day)'};
+const NET_TIERS=[
+  {id:'100',name:'Speed 100',detail:'Streaming &amp; browsing',price:80,evening:'~92 Mbps typical evening speed',best:'Great for couples and small households'},
+  {id:'250',name:'Speed 250',detail:'Busy households',price:95,evening:'~230 Mbps typical evening speed',best:'Streaming in 4K on multiple screens'},
+  {id:'500',name:'Speed 500',detail:'Our most popular speed',price:99,evening:'~480 Mbps typical evening speed',best:'Working from home, gaming and streaming',tag:'Most popular',tagColor:'#D44500'},
+  {id:'1000',name:'Speed 1000',detail:'Heavy uploads &amp; gaming',price:109,evening:'~780 Mbps typical evening speed',best:'Power users and big households'}
+];
+const NET_PERKS=['Unlimited data','Month to month, no lock-in','Free standard connection','Australian-based support'];
+const LPG={bottle:129,name:'45kg bottle exchange',note:'Delivered price inc GST · free metro delivery · order swaps anytime in the app'};
+
+const MODALS={
+  variable:{icon:'Calendar',title:'Variable rates with ongoing benefit period',body:[
+    {h:'Variable rates'},{p:"A variable rate means what you pay for energy could go up or down. Origin may change prices from time to time – we'll always let you know."},
+    {h:'Ongoing benefit period'},{p:'The benefits of this plan will not expire after any period, and you do not need to renew this plan to continue to receive these benefits.'}]},
+  goVar:{icon:'Promo',title:'Everyday low variable electricity rates',body:[
+    {p:'Enjoy discounted energy rates year round, on a flat rate tariff.'},
+    {p:'Simple and easy to get going, no need to worry about prices changing during the day.'}]},
+  edr:{icon:'BoxedReward',title:'Earn up to 10,000 Everyday Rewards Points',body:[
+    {p:'Get points for signing up:'},{l:['New customers get 5,000 points for electricity and 5,000 points for gas.','Renewing customers get 2,500 points for electricity and 2,500 points for gas.']},
+    {p:'Plus, collect 1 point for every $1 you spend on your usage and supply (incl GST).'},
+    {p:"You'll need your Everyday Rewards number to sign up."}]},
+  weekday:{icon:'TOU',title:'Half price electricity, weekdays 9am–5pm',body:[
+    {p:'Currently, the variable off-peak rate from 9am-5pm Monday to Friday is half-price compared to peak rates on this plan*'},
+    {l:['Ideal for those who use the most electricity on weekdays','Great for running appliances from 9am to 5pm weekdays','Suits those who can shift electricity use to weekdays']},
+    {p:"You'll need a smart meter to sign up for Origin Shift"}]},
+  greenpower:{icon:'GreenPower',title:'100% GreenPower electricity',body:[
+    {p:'Origin will source electricity from GreenPower accredited renewable sources to match 100% of your electricity usage.'}]},
+  ev:{icon:'EVPowerup',title:'8c/kWh EV charging for compatible vehicles',body:[
+    {p:'$5 EV full charge estimate is based on a continuous electricity charge rate of 8c/kWh powering a Tesla Model Y or Tesla Model 3 with a useable 57.5 kWh battery.'},
+    {p:'Origin EV Power Up beta is our automated electric vehicle charging solution that unlocks a lean, EV-exclusive rate of 8c/kWh for scheduled charge sessions in the Origin app.'}]},
+  solar:{icon:'Solar',title:'Get a boosted FIT for your solar generation',body:[
+    {p:'Let your solar deliver more value with our Solar Boost plan!'},
+    {p:"Get ready to export more energy to the grid and reduce your energy bills."}]},
+  night:{icon:'EVCharge',title:'Fully charge your EV from $5 with 8c/kWh overnight',body:[
+    {p:'Currently, the variable off-peak electricity rate from 12am-6am every night is 8c/kWh*'},
+    {l:['Make the most of off peak electricity rates at night to charge your EV','Great for scheduling EV charging or appliances to run overnight','Ideal for those who use the most electricity from 12am-6am']},
+    {p:"You'll need a smart meter to sign up for Origin Shift"}]},
+  battery:{icon:'Bolt',title:'4 hours of 0c/kWh rates a day plus a higher evening FIT',body:[
+    {p:'Time to let your battery start working for you'},
+    {p:'The plan built for homes with batteries - 4 free hours of electricity a day and super peak exports rates.'},
+    {l:['Charge your battery with 4 hours free electricity 11am-2pm and 2-3am* every day','Earn 33c kWh for exports between 6-9pm every day*','Stay in full control without complicated setups']}]},
+  embedded:{icon:'Info',title:'Embedded electricity networks',body:[
+    {p:'Some apartment buildings buy electricity in bulk and on-sell it to residents — this is called an embedded network.'},
+    {p:"At these addresses only selected Origin plans are available, and solar, battery and EV plans generally can't be connected."},
+    {p:'LPG and internet are unaffected.'}]},
+  signupEnd:{icon:'VerifiedUserSolid',title:'This is where sign-up begins',body:[
+    {p:'The prototype ends here — in the real flow this hands off to the Origin sign-up journey with your quote pre-filled.'},
+    {p:'About 4 minutes: contact details, concession &amp; life-support check, payment preference, done.'}]}
+};
+
+const SUGGESTIONS=[
+  {addr:'6 Nerli Street, Abbotsbury NSW 2176',ces:false},
+  {addr:'6 Nerli Place, Abbotsbury NSW 2176',ces:false},
+  {addr:'8/12 Waterside Walk, Wentworth Point NSW 2127',ces:true,tag:'Apartment'},
+  {addr:'26 Nerli Street, Prestons NSW 2170',ces:false}
+];
+
+/* ── Money & estimates ──────────────────────────────────────── */
+const HH={
+  s:{mult:.82,label:'1–2 people',kwh:'3,200',mj:'2,800'},
+  m:{mult:1,label:'2–3 people',kwh:'4,000',mj:'3,500'},
+  l:{mult:1.28,label:'4+ people',kwh:'5,100',mj:'4,500'}
+};
+const $p=s=>+String(s).replace(/[^0-9.]/g,'');
+const $f=n=>'$'+Math.round(n).toLocaleString('en-AU');
+function NETWORK(){
+  return S.quote.address?{name:'Endeavour Energy',mult:.955}:{name:'United Energy',mult:1};
+}
+function est(plan,gas){
+  const mult=HH[S.answers.household].mult*NETWORK().mult;
+  const cost=$p(gas?plan.gasYearly:plan.yearly)*mult;
+  const ref=$p(plan.ref)*mult;
+  return{cost,ref};
+}
+function estNote(gas){
+  const h=HH[S.answers.household];
+  const person=h.label.replace(' people',' person');
+  return`Estimated cost inc GST for a ${person} home using ~${gas?h.mj+' MJ':h.kwh+' kWh'} a year on a single rate tariff in the ${NETWORK().name} network.`;
+}
+
+/* ── State ──────────────────────────────────────────────────── */
+const STEP_OF={elec:'elec',gas:'gasp',lpg:'lpg',net:'net'};
+const S={
+  vw:window.innerWidth,
+  step:'hero',
+  quote:{address:'',ces:false,existing:null,moving:null,
+    services:{elec:true,gas:true,lpg:false,net:true},
+    elecPlan:null,gasPlan:null,lpg:null,net:null},
+  answers:{household:'m'},
+  addrValue:'',
+  filters:{Solar:false,EV:false,Battery:false},
+  netTier:'500',lpgQty:2,
+  sheet:{view:null,planId:null},
+  form:{name:'',email:'',mobile:'',conc:null,life:null},
+  quoteRef:null,
+  activeModal:null,modalClosing:false
+};
+function L(){return{vw:S.vw,isMobile:S.vw<768};}
+function layoutSig(){return String(S.vw<768);}
+function planById(id){return ALL_PLANS.find(p=>p.id===id);}
+function shortAddr(){return S.quote.address.split(',')[0]||S.quote.address;}
+function quoteRef(){
+  if(!S.quoteRef) S.quoteRef='Q-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  return S.quoteRef;
+}
+function queueSteps(){
+  const sv=S.quote.services,q=[];
+  if(sv.elec)q.push('elec');
+  if(sv.gas&&!S.quote.ces)q.push('gasp');
+  if(sv.lpg)q.push('lpg');
+  if(sv.net)q.push('net');
+  return q;
+}
+function nextAfter(cur){
+  const q=queueSteps();
+  const i=q.indexOf(cur);
+  return i>=0&&i<q.length-1?q[i+1]:'quote';
+}
+
+/* ── Save / restore quote via URL ───────────────────────────── */
+function serializeQuote(){
+  return btoa(JSON.stringify({q:S.quote,h:S.answers.household,r:S.quoteRef||quoteRef()}));
+}
+function restoreQuote(param){
+  try{
+    const d=JSON.parse(atob(param));
+    Object.assign(S.quote,d.q||{});
+    S.answers.household=d.h||'m';
+    S.quoteRef=d.r||null;
+    S.step='quote';
+    return true;
+  }catch(e){return false;}
+}
+
+/* ── Shared bits ────────────────────────────────────────────── */
+const tick=`<span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center;margin-top:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>`;
+function picto(plan,size){
+  if(plan.id==='edr') return`<img src="project/assets/everyday-rewards.png" alt="" style="height:${Math.round(size*.8)}px;width:auto;display:block">`;
+  const m={go:'pictogram-offer.svg',wd:'pictogram-bolt.svg',solar:'pictogram-solar.svg',night:'pictogram-night.svg',battery:'pictogram-battery.svg'};
+  return`<img src="project/assets/${m[plan.id]||'pictogram-offer.svg'}" width="${size}" height="${size}" style="display:block">`;
+}
+function perkRow(pk){
+  const hasMod=!!pk.modal;
+  return`<div${hasMod?` data-modal="${pk.modal}"`:''} style="display:flex;gap:12px;align-items:flex-start;cursor:${hasMod?'pointer':'default'}">
+  <div style="width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><cp-icon name="${pk.icon}" size="24"></cp-icon></div>
+  <span${hasMod?' class="cp-link"':''} style="font-size:14px;line-height:22px;color:#505050;${hasMod?'':'text-decoration:none'}">${pk.text}</span>
+</div>`;
+}
+function topBarHTML(lo){
+  return`<div style="height:60px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;padding:0 ${lo.isMobile?16:24}px;background:#fff;position:sticky;top:0;z-index:20">
+  <div style="width:100%;max-width:960px;display:flex;align-items:center;justify-content:space-between">
+    <img data-act="restart" src="project/assets/origin-logo-landscape.svg" alt="Origin" style="height:28px;width:auto;display:block;cursor:pointer">
+    <a href="tel:132461" class="t15" style="font-weight:600;text-decoration:none">13 24 61</a>
+  </div>
+</div>`;
+}
+function stepperHTML(cur){
+  const labels={elec:'Electricity',gasp:'Gas',lpg:'LPG',net:'Internet',quote:'Quote'};
+  const steps=[...queueSteps(),'quote'];
+  const curIdx=steps.indexOf(cur);
+  return`<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:16px 16px 0">
+  ${steps.map((s,i)=>{
+    const done=i<curIdx,active=i===curIdx;
+    return`<span class="t13" style="display:inline-flex;align-items:center;gap:5px;font-weight:${active?'700':'500'};color:${active?'#232323':done?'#0E7B3D':'#B5B5B5'}">
+      ${done?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0E7B3D" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>':''}${labels[s]}${i<steps.length-1?'<span style="color:#D8D8D8;margin-left:8px">›</span>':''}
+    </span>`;
+  }).join('')}
+</div>`;
+}
+function focusShell(lo,inner,cur,wide){
+  return`${cur?stepperHTML(cur):''}<div style="max-width:${wide||640}px;margin:0 auto;padding:${lo.isMobile?'20px 16px 64px':'28px 24px 80px'};animation:cpFade .3s ease">${inner}</div>`;
+}
+// Sumo's "here's what you've told us so far", condensed to one line.
+function soFarHTML(){
+  const bits=[];
+  if(S.quote.address) bits.push(shortAddr());
+  if(S.quote.existing) bits.push(S.quote.existing==='Yes'?'Existing customer':'New customer');
+  if(S.quote.moving) bits.push(S.quote.moving==='Moving'?'Moving in':'After a better plan');
+  if(!bits.length) return'';
+  return`<div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:0 0 18px">
+    ${bits.map(b=>`<span class="t13 mid" style="display:inline-flex;align-items:center;gap:6px">${tick}${b}</span>`).join('')}
+  </div>`;
+}
+function backLink(){
+  return`<button data-act="step-back" class="t13 mid" style="border:0;background:none;cursor:pointer;padding:6px 0;font-weight:600">← Back</button>`;
+}
+
+/* ── Hero: address capture + reassurance ────────────────────── */
+function suggestListHTML(value){
+  if(!value.trim()) return'';
+  return SUGGESTIONS.map(s=>`<div data-suggest="${s.addr.replace(/"/g,'&quot;')}" data-ces="${s.ces?1:0}" style="display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;border-bottom:1px solid #F4F4F4">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+    <span class="t15" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0">${s.addr}</span>
+    ${s.tag?`<span class="t13 mut" style="flex-shrink:0">${s.tag}</span>`:''}
+  </div>`).join('');
+}
+function heroHTML(lo){
+  const trust=(icon,txt)=>`<div style="display:flex;align-items:center;gap:8px;justify-content:center">
+    <span style="width:22px;height:22px;color:#232323;display:inline-flex;align-items:center;justify-content:center">${icon}</span>
+    <span class="t15" style="font-weight:600;white-space:nowrap">${txt}</span></div>`;
+  const star=`<svg width="16" height="16" viewBox="0 0 24 24" fill="#0E7B3D"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"></path></svg>`;
+  const quotes=[
+    ['"Switched in my lunch break — the whole thing took minutes."','Sarah, Penrith'],
+    ['"Moving day power and internet sorted in one go."','Dan, Wollongong'],
+    ['"They handled everything with my old provider. Painless."','Priya, Liverpool']
+  ];
+  return`<div style="max-width:640px;margin:0 auto;padding:${lo.isMobile?'36px 16px 64px':'56px 24px 80px'};animation:cpFade .3s ease">
+  <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
+    <div class="t15" style="font-weight:500">Electricity, natural gas &amp; internet</div>
+    <h1 class="t28" style="margin:0;font-weight:700">Compare plans for your home</h1>
+    <div class="t15 mid">See real prices for your address in under a minute.</div>
+  </div>
+  <div style="margin:26px 0 0">
+    <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #232323;border-radius:30px;padding:13px 18px;background:#fff">
+      <cp-icon name="SearchSolid" size="22"></cp-icon>
+      <input id="addr-input" class="cp-input" placeholder="Enter your address to get started…" autocomplete="off" value="${S.addrValue.replace(/"/g,'&quot;')}" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:16px;color:#232323;padding:0">
+    </div>
+    <div id="addr-list" style="display:flex;flex-direction:column;max-height:300px;overflow-y:auto">${suggestListHTML(S.addrValue)}</div>
+    <div class="t13 mut" style="text-align:center;padding-top:10px">No spam, no obligation — your address just tells us the right prices and what's available.</div>
+  </div>
+  <div style="display:flex;flex-direction:${lo.isMobile?'column':'row'};gap:${lo.isMobile?'12px':'28px'};justify-content:center;padding:30px 0 0">
+    ${trust('<cp-icon name="Bolt" size="22"></cp-icon>','2-minute quote')}
+    ${trust('<cp-icon name="VerifiedUserSolid" size="22"></cp-icon>','No lock-in, no exit fees')}
+    ${trust('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="6.5" width="13" height="9.5" rx="1"></rect><path d="M14.5 9.5h3.6l3 3V16h-6.6z"></path><circle cx="6" cy="18" r="1.9"></circle><circle cx="17.5" cy="18" r="1.9"></circle></svg>','We handle the switch')}
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:20px 0 0;flex-wrap:wrap">
+    <span style="display:inline-flex;gap:2px">${star}${star}${star}${star}${star}</span>
+    <span class="t15" style="font-weight:700">4.3</span>
+    <span class="t13 mid">from 12,400+ reviews</span>
+    <span class="t13 mut">·</span>
+    <span class="t13 mid">Award-winning value — Finder Energy Awards 2026</span>
+  </div>
+  <div style="display:grid;grid-template-columns:${lo.isMobile?'1fr':'repeat(3,1fr)'};gap:14px;padding:26px 0 0">
+    ${quotes.map(([q,who])=>`<div style="background:#F7F7F7;border-radius:14px;padding:14px 16px">
+      <div class="t13 mid" style="font-style:normal">${q}</div>
+      <div class="t13 mut" style="padding-top:6px;font-weight:600">${who}</div>
+    </div>`).join('')}
+  </div>
+  <div class="t13 mut" style="text-align:center;padding-top:22px">Australian-based support · 13 24 61 · 7 days</div>
+</div>`;
+}
+
+/* ── Qualify questions ──────────────────────────────────────── */
+function qOpt(act,v,label,sub,on){
+  return`<button data-act="${act}" data-v="${v}" class="q-opt t15${on?' on':''}">
+    <span style="display:flex;flex-direction:column;gap:1px;text-align:left"><span>${label}</span>${sub?`<span class="t13" style="font-weight:400;${on?'color:rgba(255,255,255,.75)':'color:#909090'}">${sub}</span>`:''}</span>
+    ${on?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>':''}
+  </button>`;
+}
+function qExistingHTML(lo){
+  const inner=`
+  ${soFarHTML()}
+  ${backLink()}
+  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you new to Origin?</h1>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${qOpt('q-existing','No','New customer','',S.quote.existing==='No')}
+    ${qOpt('q-existing','Yes','Existing customer',"We'll link this quote to your account",S.quote.existing==='Yes')}
+  </div>`;
+  return focusShell(lo,inner,null);
+}
+function qSituationHTML(lo){
+  const ex=S.quote.existing==='Yes';
+  const inner=`
+  ${soFarHTML()}
+  ${backLink()}
+  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Why are you comparing plans?</h1>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${qOpt('q-moving','Moving',"I'm moving to a new home",'We can have you connected by tomorrow',S.quote.moving==='Moving')}
+    ${ex
+      ?qOpt('q-moving','Renew',"I'm not moving, but I want a better plan",'Compare plans on your current account',S.quote.moving==='Renew')
+      :qOpt('q-moving','Switching',"I'm not moving, but I want a better plan",'We handle the switch — nothing to cancel',S.quote.moving==='Switching')}
+  </div>`;
+  return focusShell(lo,inner,null);
+}
+
+/* ── Services reveal ────────────────────────────────────────── */
+function servicesHTML(lo){
+  const ces=S.quote.ces;
+  const sv=S.quote.services;
+  const row=(key,icon,name,status,avail,extra)=>{
+    const on=avail&&sv[key];
+    return`<button data-act="svc" data-v="${key}" class="q-opt t15${on?' on':''}" ${avail?'':'disabled'}>
+      <span style="display:flex;align-items:center;gap:14px;min-width:0">
+        <span style="width:34px;height:34px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center">${icon}</span>
+        <span style="display:flex;flex-direction:column;gap:1px;text-align:left;min-width:0">
+          <span>${name}</span>
+          <span class="t13" style="font-weight:400;${!avail?'color:#B5B5B5':on?'color:rgba(255,255,255,.75)':'color:#909090'}">${status}${extra||''}</span>
+        </span>
+      </span>
+      ${on?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>':(avail?'<span class="t13 mut" style="flex-shrink:0">Add</span>':'')}
+    </button>`;
+  };
+  const anyOn=Object.keys(sv).some(k=>sv[k]&&(k!=='gas'||!ces));
+  const inner=`
+  ${soFarHTML()}
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Here's what Origin can offer at ${shortAddr()}</h1>
+  <p class="t15 mid" style="margin:0 0 22px;text-align:center">Everything below is available at your address — pick what you'd like in your quote.</p>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${row('elec','<cp-icon name="Electricity" size="32"></cp-icon>','Electricity',
+      ces?'Available · embedded network — 2 plans ':'Available · '+NETWORK().name+' network',true,
+      ces?'<span data-modal="embedded" style="display:inline-flex;width:15px;height:15px;vertical-align:-2px"><cp-icon name="Info" size="15"></cp-icon></span>':'')}
+    ${row('gas','<cp-icon name="Gas" size="32"></cp-icon>','Natural gas',
+      ces?'No mains gas at this address':'Available · mains connection',!ces)}
+    ${row('lpg','<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg>','LPG bottles',
+      ces?'Available · 45kg delivered bottles':'Optional · 45kg delivered bottles',true)}
+    ${row('net','<cp-icon name="Bolt" size="30"></cp-icon>','nbn® Internet','Available · FTTP ready',true)}
+  </div>
+  ${anyOn?`<button data-act="svc-continue" class="cta t15" style="width:100%;margin-top:20px">Continue</button>`:`<div class="t13 mut" style="text-align:center;padding-top:16px">Pick at least one service to continue.</div>`}`;
+  return focusShell(lo,inner,null);
+}
+
+/* ── Rich plan cards + carousel (regular compare-plans style) ─ */
+function richPriceBlock(plan,gas){
+  const e=est(plan,gas);
+  return`<div style="border-radius:20px;background:#F6F6F6;padding:22px 20px;display:flex;flex-direction:column;gap:12px">
+  ${gas?'':`<div style="display:flex;flex-direction:column;gap:2px">
+    <div style="display:flex;align-items:baseline;gap:2px">
+      <span style="font-weight:700;font-size:30px;line-height:34px;color:#232323">${plan.discount}</span>
+      <span style="font-weight:700;font-size:16px;color:#232323">%</span>
+    </div>
+    <span class="t13 mid">less than the ${$f(e.ref)} reference price</span>
+  </div>
+  <div style="height:1px;background:rgba(0,0,0,.1)"></div>`}
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;align-items:baseline;gap:5px">
+      <span style="font-weight:700;font-size:24px;line-height:30px;color:#232323">${$f(e.cost)}</span>
+      <span class="t13" style="font-weight:700">/year</span>
+      <span data-act="est-modal" style="width:17px;height:17px;color:#A0A0A0;display:inline-flex;cursor:pointer"><cp-icon name="Info" size="17"></cp-icon></span>
+    </div>
+    <span class="t13 mut">${estNote(gas)}</span>
+  </div>
+</div>`;
+}
+function richCardHTML(plan,lo,gas){
+  const w=lo.isMobile?300:340;
+  const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
+  return`<div class="rcard" style="width:${w}px">
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
+    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${tag}</div>
+    <div style="text-align:center;padding:0 6px">
+      <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323;min-height:46px;display:flex;align-items:center;justify-content:center">${plan.name}</div>
+      <div class="t13 mid" style="min-height:40px">${gas?'Natural gas on a simple single rate.':plan.tagline}</div>
+    </div>
+  </div>
+  ${richPriceBlock(plan,gas)}
+  <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">What's included</span>
+      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+    </div>
+    ${plan.included.map(perkRow).join('')}
+    ${(!gas&&plan.addable&&plan.addable.length)?`
+    <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">Things you can add</span>
+      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+    </div>
+    ${plan.addable.map(perkRow).join('')}`:''}
+  </div>
+  <div style="background:#F6F6F6;border-radius:14px;padding:13px 15px;display:flex;flex-direction:column;gap:5px">
+    <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Daily supply</span><span style="font-weight:600">${gas?GAS_RATES.supply:plan.rates.supply}</span></div>
+    <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">${gas?'Usage':'Peak usage'}</span><span style="font-weight:600">${gas?GAS_RATES.usage:plan.rates.peak}</span></div>
+    ${(!gas&&plan.rates.special)?`<div class="t13" style="display:flex;justify-content:space-between"><span class="mid">${plan.rates.special.label}</span><span style="font-weight:600">${plan.rates.special.value}</span></div>`:''}
+    ${gas?'':`<div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Solar feed-in</span><span style="font-weight:600">${plan.rates.fit}</span></div>`}
+  </div>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+    <button data-act="pick-plan" data-v="${plan.id}" class="cta t15" style="width:100%">Select plan</button>
+    <div style="display:flex;justify-content:center;gap:16px">
+      <a href="#" class="t13 mut">Energy fact sheet</a><a href="#" class="t13 mut">Terms &amp; conditions</a>
+    </div>
+  </div>
+</div>`;
+}
+function netCardHTML(t,lo){
+  const w=lo.isMobile?300:340;
+  const tag=t.tag?`<span style="position:absolute;top:2px;right:14px;background:${t.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${t.tag}</span>`:'';
+  return`<div class="rcard" style="width:${w}px">
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
+    <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%;position:relative"><cp-icon name="Bolt" size="56"></cp-icon>${tag}</div>
+    <div style="text-align:center;padding:0 6px">
+      <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323">nbn® ${t.name}</div>
+      <div class="t13 mid" style="min-height:40px">${t.best}</div>
+    </div>
+  </div>
+  <div style="border-radius:20px;background:#F6F6F6;padding:22px 20px;display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;align-items:baseline;gap:5px">
+      <span style="font-weight:700;font-size:30px;line-height:34px;color:#232323">$${t.price}</span>
+      <span class="t13" style="font-weight:700">/month</span>
+    </div>
+    <span class="t13 mid">${t.evening}</span>
+    <span class="t13 mut">Month to month for new nbn connections. Speeds may vary by address and network.</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">What's included</span>
+      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+    </div>
+    ${NET_PERKS.map(x=>`<div style="display:flex;gap:12px;align-items:flex-start">${tick}<span style="font-size:14px;line-height:22px;color:#505050">${x}</span></div>`).join('')}
+  </div>
+  <div style="margin-top:auto">
+    <button data-act="pick-net" data-v="${t.id}" class="cta t15" style="width:100%">Select plan</button>
+  </div>
+</div>`;
+}
+function carouselHTML(lo,id,cardsHtml,n){
+  return`<div style="position:relative">
+  ${lo.isMobile?'':`<div style="display:flex;justify-content:flex-end;gap:8px;max-width:960px;margin:0 auto;padding:0 16px 12px">
+    <button data-act="car-prev" data-v="${id}" class="car-btn" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"></path></svg></button>
+    <button data-act="car-next" data-v="${id}" class="car-btn" aria-label="Next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg></button>
+  </div>`}
+  <div id="${id}" class="car-row" style="max-width:960px;margin:0 auto">${cardsHtml}</div>
+  ${lo.isMobile&&n>1?`<div class="t13 mid" style="display:flex;align-items:center;justify-content:center;gap:8px;padding-top:4px;font-weight:600">Swipe to compare plans
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h4"></path><path d="M7.5 9.5 5 12l2.5 2.5"></path><path d="M19 12h-4"></path><path d="M16.5 9.5 19 12l-2.5 2.5"></path><circle cx="12" cy="12" r="2.4"></circle></svg></div>`:''}
+</div>`;
+}
+
+/* ── Product steps ──────────────────────────────────────────── */
+function elecPlansList(){
+  if(S.quote.ces) return[BASE_PLANS[0],BASE_PLANS[1]];
+  let list=[...BASE_PLANS];
+  ['Solar','EV','Battery'].forEach(k=>{if(S.filters[k]) list.unshift(ADDON_PLANS[k]);});
+  return list;
+}
+function elecHTML(lo){
+  const plans=elecPlansList();
+  const chk=(k,label)=>`<label data-act="filter" data-v="${k}" class="chk${S.filters[k]?' on':''}"><span class="box">${S.filters[k]?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>':''}</span>${label}</label>`;
+  const inner=`
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your electricity plan</h1>
+  <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
+  ${S.quote.moving==='Moving'?`<div class="t13 grn" style="text-align:center;padding-bottom:4px">Moving in? We can have you connected by tomorrow.</div>`:''}
+  ${S.quote.ces?`<div class="t13" style="text-align:center;color:#B15A00;font-weight:600;padding-bottom:4px">Embedded network — ${plans.length} plans available at this address <span data-modal="embedded" style="display:inline-flex;width:15px;height:15px;vertical-align:-2px"><cp-icon name="Info" size="15"></cp-icon></span></div>`:''}
+  ${S.quote.ces?'':`<div style="display:flex;justify-content:center;gap:18px;padding:12px 0 4px">${chk('Solar','Solar')}${chk('EV','EV')}${chk('Battery','Battery')}</div>`}`;
+  return`${stepperHTML('elec')}
+<div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">${inner}</div>
+${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo,false)).join(''),plans.length)}
+<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip electricity</button></div>`;
+}
+function gaspHTML(lo){
+  const plans=[BASE_PLANS[0],BASE_PLANS[1]];
+  return`${stepperHTML('gasp')}
+<div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your gas plan</h1>
+  <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
+</div>
+${carouselHTML(lo,'car-gas',plans.map(p=>richCardHTML(p,lo,true)).join(''),plans.length)}
+<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip natural gas</button></div>`;
+}
+function lpgHTML(lo){
+  const opt=q=>{
+    const on=S.lpgQty===q;
+    return`<button data-act="lpg-qty" data-v="${q}" class="q-opt t15${on?' on':''}">
+      <span>${q} × 45kg bottle${q>1?'s':''}</span>
+      <span style="font-weight:700;white-space:nowrap">$${LPG.bottle*q}<span class="t13" style="font-weight:600"> per swap</span></span>
+    </button>`;
+  };
+  const inner=`
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">LPG bottles</h1>
+  <p class="t15 mid" style="margin:0 0 18px;text-align:center">45kg exchange bottles, delivered to ${shortAddr()||'your door'}.</p>
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:420px;margin:0 auto">
+    ${opt(1)}${opt(2)}
+  </div>
+  <div class="t13 mut" style="text-align:center;padding-top:12px">${LPG.note}</div>
+  <div style="max-width:420px;margin:18px auto 0;display:flex;flex-direction:column;gap:8px">
+    <button data-act="lpg-add" class="cta t15" style="width:100%">Add ${S.lpgQty} bottle${S.lpgQty>1?'s':''} — $${LPG.bottle*S.lpgQty} per swap</button>
+    <button data-act="skip-product" class="t15 mid" style="border:0;background:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:8px">Skip LPG</button>
+  </div>`;
+  return focusShell(lo,inner,'lpg');
+}
+function netHTML(lo){
+  return`${stepperHTML('net')}
+<div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your internet plan</h1>
+  <div class="t13 mut" style="text-align:center;padding-bottom:4px">nbn® at ${shortAddr()} — FTTP ready</div>
+</div>
+${carouselHTML(lo,'car-net',NET_TIERS.map(t=>netCardHTML(t,lo)).join(''),NET_TIERS.length)}
+<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip internet</button></div>`;
+}
+
+/* ── Your quote ─────────────────────────────────────────────── */
+function quoteRowHTML(pictoHTML,name,detail,price,editStep){
+  return`<div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px">
+  <div style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center">${pictoHTML}</div>
+  <div style="flex:1 1 auto;min-width:0">
+    <div class="t13 mut">${name}</div>
+    <div class="t15" style="font-weight:700">${detail}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+    <span class="t15" style="font-weight:700;white-space:nowrap">${price}</span>
+    <button data-act="edit-step" data-v="${editStep}" class="t13" style="border:0;background:none;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#505050;padding:0">edit</button>
+  </div>
+</div>`;
+}
+function quoteHTML(lo){
+  const q=S.quote;
+  const rows=[];
+  let hasEnergy=false;
+  if(q.elecPlan){
+    const p=planById(q.elecPlan);hasEnergy=true;
+    rows.push(quoteRowHTML(picto(p,38),'Electricity — '+p.name,p.benefit,`${$f(est(p,false).cost)}/year`,'elec'));
+  }
+  if(q.gasPlan){
+    const p=planById(q.gasPlan);hasEnergy=true;
+    rows.push(quoteRowHTML(`<cp-icon name="Gas" size="34"></cp-icon>`,'Natural gas — '+p.name,'Single rate',`${$f(est(p,true).cost)}/year`,'gasp'));
+  }
+  if(q.lpg) rows.push(quoteRowHTML(`<cp-icon name="Gas" size="34"></cp-icon>`,'LPG bottles',`${q.lpg.qty} × ${LPG.name}`,`$${q.lpg.qty*LPG.bottle} per swap`,'lpg'));
+  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);rows.push(quoteRowHTML(`<cp-icon name="Bolt" size="34"></cp-icon>`,'nbn® Internet',t.name,`$${t.price}/month`,'net'));}
+  const situation=q.existing==='Yes'?(q.moving==='Moving'?'existing customer, moving':'existing customer, plan change'):(q.moving==='Moving'?'new customer, moving in':'new customer, switching');
+  const inner=`
+  <div style="text-align:center;padding-bottom:18px">
+    <h1 class="t28" style="margin:0 0 6px;font-weight:700">Your quote</h1>
+    <div class="t13 mut">${quoteRef()} · ${q.address||'No address'} · ${situation}</div>
+  </div>
+  ${rows.length?`<div style="display:flex;flex-direction:column;gap:12px">${rows.join('')}</div>`
+    :`<div class="t15 mid" style="text-align:center;padding:20px 0">No products selected yet. <button data-act="edit-step" data-v="services" class="qlink t15">Choose services</button></div>`}
+  ${hasEnergy?`<div class="t13 mut" style="padding-top:14px">${estNote(false)} Gas estimates use ~${HH[S.answers.household].mj} MJ a year.</div>`:''}
+  ${rows.length?`
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:22px auto 0">
+    <button data-act="go-signup" class="cta t15" style="width:100%">Sign up</button>
+    <button data-act="save-quote" class="t15" style="border:1.5px solid #C9C9C9;background:#fff;border-radius:26px;min-height:52px;font-weight:600;cursor:pointer">Save quote</button>
+  </div>
+  <div class="t13 mut" style="text-align:center;padding-top:14px">No lock-in · no exit fees · about 4 minutes to sign up</div>`:''}`;
+  return focusShell(lo,inner,'quote');
+}
+
+/* ── Sales form ─────────────────────────────────────────────── */
+function signupFormHTML(lo){
+  const q=S.quote;
+  const bits=[];
+  if(q.elecPlan) bits.push('Electricity');
+  if(q.gasPlan) bits.push('Natural gas');
+  if(q.lpg) bits.push(`LPG × ${q.lpg.qty}`);
+  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);bits.push(`nbn® ${t.name}`);}
+  const lead=q.elecPlan?planById(q.elecPlan):q.gasPlan?planById(q.gasPlan):BASE_PLANS[0];
+  const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px">
+    <span class="t13" style="font-weight:600;color:#505050">${label}</span>
+    <input data-field="${key}" type="${type}" placeholder="${ph}" value="${(S.form[key]||'').replace(/"/g,'&quot;')}" autocomplete="off" style="min-height:48px;border:1.5px solid #C9C9C9;border-radius:14px;padding:0 16px;font-family:gordita;font-size:16px;color:#232323;outline:none">
+  </label>`;
+  const yn=(label,key)=>`<div style="display:flex;flex-direction:column;gap:8px">
+    <span class="t13" style="font-weight:600;color:#505050">${label}</span>
+    <div style="display:flex;gap:10px">
+      ${['Yes','No'].map(o=>`<button data-act="form-opt" data-v="${key}:${o}" class="q-opt t15${S.form[key]===o?' on':''}" style="min-height:48px;flex:1;justify-content:center">${o}</button>`).join('')}
+    </div>
+  </div>`;
+  const inner=`
+  <div style="background:#F7F7F7;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center">${picto(lead,38)}</div>
+    <div style="flex:1 1 auto;min-width:0">
+      <div class="t15" style="font-weight:700">${quoteRef()}</div>
+      <div class="t13 mut">${bits.join(' · ')} · ${shortAddr()}</div>
+    </div>
+    <button data-act="edit-quote" class="t13" style="border:0;background:none;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;flex-shrink:0">change</button>
+  </div>
+  <div class="t13 mut" style="padding:14px 2px 18px">Set up your account · takes about 4 minutes · no credit card needed</div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    ${field('Full name','name','text','Jane Citizen')}
+    ${field('Email','email','email','jane@example.com')}
+    ${field('Mobile','mobile','tel','04XX XXX XXX')}
+    ${yn('Do you have a concession card?','conc')}
+    ${yn('Does anyone at this address rely on life support equipment?','life')}
+    <button data-act="signup-end" class="cta t15" style="width:100%;margin-top:4px">Start my connection</button>
+  </div>
+  <div style="display:flex;gap:20px;padding-top:14px">
+    <a href="#" class="t13 mut">Energy fact sheet</a>
+    <a href="#" class="t13 mut">Terms &amp; conditions</a>
+  </div>`;
+  return`<div style="max-width:520px;margin:0 auto;padding:${lo.isMobile?'24px 20px 60px':'40px 24px 80px'};animation:cpFade .3s ease">${inner}</div>`;
+}
+
+/* ── Modals ─────────────────────────────────────────────────── */
+function estimatesModalBody(){
+  const row=k=>`<button data-act="hh-set" data-v="${k}" class="q-opt t15${S.answers.household===k?' on':''}" style="min-height:48px">${HH[k].label}${S.answers.household===k?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>':''}</button>`;
+  return`<span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Estimated yearly cost inc GST on a single rate tariff in the ${NETWORK().name} network, based on typical usage for your household size:</span>
+  <div style="display:flex;flex-direction:column;gap:10px">${row('s')}${row('m')}${row('l')}</div>
+  <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Your actual costs depend on your usage and tariff. Estimates exclude any sign-up offers.</span>`;
+}
+function saveQuoteModalBody(){
+  const url=location.origin+location.pathname+'?q='+serializeQuote();
+  return`<span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Your quote <strong>${quoteRef()}</strong> is saved in this link — prices are estimates and may change:</span>
+  <input readonly value="${url.replace(/"/g,'&quot;')}" onclick="this.select()" style="min-height:48px;border:1.5px solid #C9C9C9;border-radius:14px;padding:0 14px;font-family:gordita;font-size:13px;color:#505050;outline:none;width:100%">
+  <button data-act="copy-quote" class="cta t15" style="width:100%">Copy link</button>
+  <span id="copy-done" class="t13 grn" style="display:none;text-align:center">Link copied</span>`;
+}
+function modalHTML(){
+  const{activeModal,modalClosing}=S;
+  if(!activeModal) return'';
+  const lo=L();
+  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody}};
+  const m=dyn[activeModal]||MODALS[activeModal];
+  if(!m) return'';
+  const oAnim=modalClosing?'cpFadeOut .3s cubic-bezier(.64,0,.78,.39) forwards':'cpFade .2s ease';
+  const sAnim=lo.isMobile
+    ?(modalClosing?'cpSlideDown .3s cubic-bezier(.64,0,.78,.39) forwards':'cpSlideUp .3s cubic-bezier(.22,.61,.36,1)')
+    :(modalClosing?'cpModalOut .22s cubic-bezier(.4,0,1,1) forwards':'cpModalIn .34s cubic-bezier(.22,.61,.36,1)');
+  const bodyHTML=typeof m.body==='function'?m.body():m.body.map(b=>{
+    if(b.h) return`<span style="font-weight:700;font-size:17px;line-height:24px;color:#232323;margin-top:4px">${b.h}</span>`;
+    if(b.p) return`<span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">${b.p}</span>`;
+    if(b.l) return`<ul style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:12px">${b.l.map(it=>`<li style="font-weight:400;font-size:16px;line-height:26px;color:#505050">${it}</li>`).join('')}</ul>`;
+    return'';
+  }).join('');
+  return`<div id="modal-overlay" style="position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.75);display:flex;flex-direction:column;align-items:center;justify-content:${lo.isMobile?'flex-end':'center'};padding:${lo.isMobile?'0':'24px'};box-sizing:border-box;animation:${oAnim}">
+  <div id="modal-sheet" style="${lo.isMobile
+    ?'width:100%;max-width:402px;max-height:90vh;overflow-y:auto;background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px'
+    :'width:100%;max-width:560px;max-height:86vh;overflow-y:auto;background:#fff;border-radius:20px;padding:40px 44px'};display:flex;flex-direction:column;gap:20px;box-sizing:border-box;animation:${sAnim}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:flex-start"><cp-icon name="${m.icon}" size="42"></cp-icon></div>
+      <div id="modal-close" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"></path></svg>
+      </div>
+    </div>
+    <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323;letter-spacing:-.01em;text-wrap:balance">${m.title}</span>
+    <div style="display:flex;flex-direction:column;gap:14px">${bodyHTML}</div>
+  </div>
+</div>`;
+}
+let _closeTimer=null,_scrollY=0,_prevBody=null;
+function _restoreScroll(){
+  const b=document.body;
+  if(_prevBody){b.style.position=_prevBody.pos;b.style.top=_prevBody.top;b.style.left=_prevBody.left;b.style.right=_prevBody.right;b.style.width=_prevBody.w;b.style.overflow=_prevBody.ov;_prevBody=null;}
+  window.scrollTo(0,_scrollY);
+}
+function openModal(key){
+  clearTimeout(_closeTimer);
+  if(!S.activeModal){
+    _scrollY=window.scrollY||0;
+    const b=document.body;
+    _prevBody={pos:b.style.position,top:b.style.top,left:b.style.left,right:b.style.right,w:b.style.width,ov:b.style.overflow};
+    b.style.cssText+=`;position:fixed;top:${-_scrollY}px;left:0;right:0;width:100%;overflow:hidden`;
+  }
+  S.activeModal=key;S.modalClosing=false;
+  document.getElementById('modal-layer').innerHTML=modalHTML();
+  const ov=document.getElementById('modal-overlay');
+  if(ov) ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
+  const cl=document.getElementById('modal-close');
+  if(cl) cl.addEventListener('click',closeModal);
+}
+function closeModal(){
+  if(S.modalClosing) return;
+  S.modalClosing=true;
+  document.getElementById('modal-layer').innerHTML=modalHTML();
+  _closeTimer=setTimeout(()=>{_restoreScroll();S.activeModal=null;S.modalClosing=false;document.getElementById('modal-layer').innerHTML='';},300);
+}
+
+/* ── Flow ───────────────────────────────────────────────────── */
+function goStep(step,push){
+  S.step=step;
+  if(push!==false) history.pushState({step},'','');
+  window.scrollTo(0,0);
+  render();
+}
+
+/* ── Render ─────────────────────────────────────────────────── */
+function render(){
+  const lo=L();
+  let body='';
+  if(S.step==='hero') body=heroHTML(lo);
+  else if(S.step==='q-existing') body=qExistingHTML(lo);
+  else if(S.step==='q-situation') body=qSituationHTML(lo);
+  else if(S.step==='services') body=servicesHTML(lo);
+  else if(S.step==='elec') body=elecHTML(lo);
+  else if(S.step==='gasp') body=gaspHTML(lo);
+  else if(S.step==='lpg') body=lpgHTML(lo);
+  else if(S.step==='net') body=netHTML(lo);
+  else if(S.step==='quote') body=quoteHTML(lo);
+  else if(S.step==='signup') body=signupFormHTML(lo);
+  document.getElementById('root').innerHTML=topBarHTML(lo)+body;
+  if(S.step==='hero'){
+    const inp=document.getElementById('addr-input');
+    if(inp){
+      inp.focus();
+      inp.setSelectionRange(inp.value.length,inp.value.length);
+      inp.addEventListener('input',e=>{
+        S.addrValue=e.target.value;
+        const list=document.getElementById('addr-list');
+        if(list) list.innerHTML=suggestListHTML(S.addrValue);
+      });
+    }
+  }
+}
+
+/* ── Events ─────────────────────────────────────────────────── */
+document.addEventListener('click',e=>{
+  const sg=e.target.closest('[data-suggest]');
+  if(sg){
+    S.quote.address=sg.getAttribute('data-suggest');
+    S.quote.ces=sg.getAttribute('data-ces')==='1';
+    if(S.quote.ces){S.quote.services.gas=false;S.quote.services.lpg=true;}
+    goStep('q-existing');return;
+  }
+  const md=e.target.closest('[data-modal]');
+  if(md){openModal(md.getAttribute('data-modal'));return;}
+  const el=e.target.closest('[data-act]');
+  if(!el) return;
+  const act=el.getAttribute('data-act'),v=el.getAttribute('data-v');
+  switch(act){
+    case'step-back':history.back();break;
+    case'q-existing':S.quote.existing=v;goStep('q-situation');break;
+    case'q-moving':S.quote.moving=v;goStep('services');break;
+    case'svc':S.quote.services[v]=!S.quote.services[v];render();break;
+    case'svc-continue':goStep(queueSteps()[0]||'quote');break;
+    case'filter':S.filters[v]=!S.filters[v];render();break;
+    case'car-prev':case'car-next':{
+      const row=document.getElementById(v);
+      if(row){
+        const card=row.querySelector('.rcard');
+        const w=card?card.getBoundingClientRect().width+16:340;
+        row.scrollBy({left:act==='car-next'?w:-w,behavior:'smooth'});
+      }
+      break;}
+    case'pick-plan':
+      if(S.step==='elec') S.quote.elecPlan=v;
+      else if(S.step==='gasp') S.quote.gasPlan=v;
+      goStep(nextAfter(S.step));break;
+    case'pick-net':S.quote.net=v;goStep(nextAfter('net'));break;
+    case'skip-product':{
+      if(S.step==='elec')S.quote.elecPlan=null;
+      else if(S.step==='gasp')S.quote.gasPlan=null;
+      else if(S.step==='lpg')S.quote.lpg=null;
+      else if(S.step==='net')S.quote.net=null;
+      goStep(nextAfter(S.step));break;}
+    case'lpg-qty':S.lpgQty=+v;render();break;
+    case'lpg-add':S.quote.lpg={qty:S.lpgQty};goStep(nextAfter('lpg'));break;
+    case'est-modal':openModal('estimates');break;
+    case'hh-set':S.answers.household=v;render();openModal('estimates');break;
+    case'edit-step':goStep(v);break;
+    case'go-signup':goStep('signup');break;
+    case'edit-quote':goStep('quote');break;
+    case'save-quote':openModal('savequote');break;
+    case'copy-quote':{
+      const url=location.origin+location.pathname+'?q='+serializeQuote();
+      const done=()=>{const d=document.getElementById('copy-done');if(d)d.style.display='block';};
+      if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,done);
+      else done();
+      break;}
+    case'form-opt':{const[f,val]=v.split(':');S.form[f]=val;render();break;}
+    case'signup-end':openModal('signupEnd');break;
+    case'restart':
+      S.step='hero';S.quoteRef=null;S.addrValue='';
+      S.quote={address:'',ces:false,existing:null,moving:null,services:{elec:true,gas:true,lpg:false,net:true},elecPlan:null,gasPlan:null,lpg:null,net:null};
+      S.filters={Solar:false,EV:false,Battery:false};
+      S.form={name:'',email:'',mobile:'',conc:null,life:null};
+      window.scrollTo(0,0);render();break;
+  }
+});
+document.addEventListener('input',e=>{
+  const f=e.target.closest&&e.target.closest('[data-field]');
+  if(f) S.form[f.getAttribute('data-field')]=f.value;
+});
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&S.activeModal&&!S.modalClosing) closeModal();
+});
+window.addEventListener('popstate',e=>{
+  S.step=(e.state&&e.state.step)||'hero';
+  render();
+});
+let _lastW=window.innerWidth,_lastSig,_rT=null;
+window.addEventListener('resize',()=>{
+  const w=window.innerWidth;
+  if(w===_lastW) return;
+  _lastW=w;S.vw=w;
+  clearTimeout(_rT);
+  _rT=setTimeout(()=>{
+    const sig=layoutSig();
+    if(sig!==_lastSig){_lastSig=sig;render();}
+  },80);
+},{passive:true});
+
+/* ── Init (restore saved quote from ?q=) ────────────────────── */
+const _qp=new URLSearchParams(location.search).get('q');
+if(_qp&&restoreQuote(_qp)) history.replaceState({step:'quote'},'','');
+else history.replaceState({step:'hero'},'','');
+_lastSig=layoutSig();
+render();
+})();
+</script>
+</body>
+</html>

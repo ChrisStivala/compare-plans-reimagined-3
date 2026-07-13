@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:gordita;src:url('fonts/gorditaregular-webfont.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:gordita;src:url('fonts/gorditamedium-webfont.woff2') format('woff2');font-weight:500 600;font-display:swap}
+@font-face{font-family:gordita;src:url('fonts/gorditabold-webfont.woff2') format('woff2');font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#dfe1e3;font-family:gordita,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.cp-scroll{scrollbar-width:none}
+.cp-scroll::-webkit-scrollbar{display:none}
+.cp-input::placeholder{color:#909090;font-weight:700;opacity:1}
+cp-icon{display:inline-flex;line-height:0}
+img,svg,cp-icon{-webkit-user-drag:none;-khtml-user-drag:none;user-drag:none}
+@keyframes cpFade{from{opacity:0}to{opacity:1}}
+@keyframes cpFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes cpBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes cpDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cpPop{0%{transform:scale(0)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes cpSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes cpSlideDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+@keyframes cpCardIn{0%{opacity:0;transform:translateY(32px);margin-left:calc(-1 * var(--cw,308px))}55%{opacity:1}100%{opacity:1;transform:translateY(0);margin-left:0}}
+@keyframes cpCardOut{0%{opacity:1;transform:translateY(0);margin-left:0}35%{opacity:0}100%{opacity:0;transform:translateY(28px);margin-left:calc(-1 * var(--cw,308px))}}
+@keyframes cpModalIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes cpModalOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(16px) scale(.98)}}
+</style>
+<link rel="preload" as="image" href="assets/everyday-rewards.png">
+<link rel="preload" as="image" href="assets/comfy-credits.png">
+<link rel="preload" as="image" href="assets/pictogram-offer.svg">
+<link rel="preload" as="image" href="assets/pictogram-bolt.svg">
+<link rel="preload" as="image" href="assets/pictogram-solar.svg">
+<link rel="preload" as="image" href="assets/pictogram-battery.svg">
+<link rel="preload" as="image" href="assets/pictogram-night.svg">
+<script src="components/cp-icon.js"></script>
+</helmet>
+<div style="min-height:100vh;display:flex;justify-content:center;background:{{ pageBg }};padding:0">
+<div style="width:100%;max-width:{{ shellMax }};background:#fff;min-height:100vh;position:relative;overflow:hidden">
+
+  <!-- Header (mobile) -->
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+  <div style="height:60px;border-bottom:1px solid rgba(0,0,0,.1);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:sticky;top:0;background:#fff;z-index:20">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:24px;height:24px;color:#232323;display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <cp-icon name="MenuLine" size="24"></cp-icon>
+      </div>
+      <img src="assets/origin-logo-landscape.svg" alt="Origin" style="height:30px;width:auto;display:block">
+      <span style="width:5px;height:5px;border-radius:50%;background:#FF6024;display:inline-block"></span>
+    </div>
+    <button style="border:0;background:#FFB233;border-radius:20px;height:40px;padding:0 20px;font-family:gordita;font-weight:600;font-size:14.5px;color:#232323;cursor:pointer">Log in</button>
+  </div>
+  </sc-if>
+
+  <!-- Header (tablet / desktop) -->
+  <sc-if value="{{ isWide }}" hint-placeholder-val="{{ false }}">
+  <div style="height:76px;border-bottom:1px solid rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;padding:0 40px;position:sticky;top:0;background:#fff;z-index:20">
+    <div style="width:100%;max-width:{{ contentMax }};display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:6px">
+        <img src="assets/origin-logo-landscape.svg" alt="Origin" style="height:34px;width:auto;display:block">
+        <span style="width:6px;height:6px;border-radius:50%;background:#FF6024;display:inline-block"></span>
+      </div>
+      <button style="border:0;background:#FFB233;border-radius:24px;height:44px;padding:0 28px;font-family:gordita;font-weight:600;font-size:15px;color:#232323;cursor:pointer;white-space:nowrap;flex-shrink:0">Log in</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- Breadcrumb + hero (mobile) -->
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="padding:32px 16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:4px;color:#505050">
+        <div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;color:#505050">
+          <cp-icon name="ChevronLeftSmallSolid" size="12"></cp-icon>
+        </div>
+        <span style="font-weight:500;font-size:12px;color:#505050">Energy</span>
+      </div>
+      <span style="font-weight:500;font-size:20px;line-height:28px;color:#232323">Electricity &amp; Natural Gas plans</span>
+    </div>
+
+    <div style="padding:0 16px 0">
+      <div style="border-radius:32px;background:#FFF0D6;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:28px 24px 0;display:flex;justify-content:flex-start">
+          <div style="position:relative;width:210px;height:172px">
+            <div style="position:absolute;left:18px;top:138px;width:168px;height:22px;border-radius:50%;background:rgba(102,65,0,.20);filter:blur(2px)"></div>
+            <img src="assets/comfy-credits.png" alt="Comfy Credits" style="position:absolute;left:0;top:-12px;width:210px;height:210px;object-fit:contain">
+          </div>
+        </div>
+        <div style="padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
+          <span style="font-weight:700;font-size:24px;line-height:28px;color:#232323">Switch or move with Origin Go Variable</span>
+          <span style="font-weight:400;font-size:14px;line-height:24px;color:#232323">Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas. Sign up online and stay until 30 June 2026.</span>
+          <span style="font-weight:400;font-size:14px;line-height:24px;color:#232323">New or moving residents in NSW, SA or VIC only. Not available if you've had a credit for the same fuel and address in the last 12 months.</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:20px;height:20px;color:#232323;display:flex;align-items:center;justify-content:center">
+              <cp-icon name="VerifiedUserSolid" size="20"></cp-icon>
+            </div>
+            <span style="font-weight:500;font-size:12px;line-height:20px;color:#000">No lock-in contract, no exit fees.</span>
+          </div>
+        </div>
+        <div style="padding:8px">
+          <div style="border-radius:24px;background:#fff;box-shadow:0 0 16px rgba(0,0,0,.08);padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div onClick="{{ searchAction }}" style="display:flex;align-items:center;gap:8px;padding:8px 0;cursor:text;min-width:0">
+              <div style="width:24px;height:24px;flex-shrink:0;color:#505050;display:flex;align-items:center;justify-content:center"><cp-icon name="SearchSolid" size="24"></cp-icon></div>
+              <input ref="{{ searchInputRef }}" class="cp-input" value="{{ searchValue }}" placeholder="Find plans for your home..." onFocus="{{ onSearchFocus }}" onChange="{{ onSearchInput }}" autoComplete="off" style="flex-grow:1;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:16px;line-height:24px;color:#232323;padding:0;caret-color:#505050">
+              <sc-if value="{{ showClear }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ clearSearch }}" style="width:28px;height:28px;flex-shrink:0;border-radius:50%;background:#505050;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"></path></svg>
+                </div>
+              </sc-if>
+              <sc-if value="{{ showCheck }}" hint-placeholder-val="{{ false }}">
+                <div style="width:28px;height:28px;flex-shrink:0;border-radius:50%;background:#8BB832;display:flex;align-items:center;justify-content:center;animation:cpPop .32s cubic-bezier(.34,1.56,.64,1)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ showDropdown }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;border-top:1px solid #ECECEC;margin-top:-8px;animation:cpDrop .2s ease">
+                <sc-for list="{{ suggestions }}" as="sug" hint-placeholder-count="3">
+                  <div onClick="{{ sug.onSelect }}" style="display:flex;align-items:center;gap:12px;padding:14px 4px;cursor:pointer;border-bottom:1px solid #F4F4F4" style-hover="background:#F7F7F7">
+                    <div style="width:20px;height:20px;flex-shrink:0;color:#909090;display:flex;align-items:center;justify-content:center">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+                    </div>
+                    <span style="font-family:gordita;font-weight:500;font-size:15px;color:#232323;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sug.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <button onClick="{{ searchAction }}" style="border:0;background:#FFB233;border-radius:24px;height:48px;font-family:gordita;font-weight:600;font-size:16px;color:#232323;cursor:pointer">{{ searchButtonLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- Hero (tablet / desktop) -->
+  <sc-if value="{{ isWide }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#fff;display:flex;flex-direction:column;align-items:center">
+    <div style="width:100%;box-sizing:border-box;padding:32px 40px 0;display:flex;justify-content:center">
+     <div style="width:100%;max-width:{{ contentMax }};display:flex;flex-direction:column;gap:16px">
+      <!-- Breadcrumb -->
+      <div style="display:flex;align-items:center;gap:8px;color:#737373;font-weight:500;font-size:13px;padding-top:8px">
+        <span style="text-decoration:underline;cursor:pointer">Home</span>
+        <span style="color:#B5B5B5">›</span>
+        <span style="text-decoration:underline;cursor:pointer">Energy</span>
+        <span style="color:#B5B5B5">›</span>
+        <span>Plans</span>
+      </div>
+      <span style="{{ heroSubStyle }}">Electricity &amp; Natural Gas plans</span>
+     </div>
+    </div>
+    <div style="width:100%;box-sizing:border-box;padding:16px 40px 48px">
+      <div style="{{ heroBandStyle }}">
+        <div style="{{ heroInnerStyle }}">
+        
+        <div style="{{ heroTextStyle }}">
+          <h1 style="{{ heroH1Style }}">Switch or move with Origin Go Variable</h1>
+          <span style="{{ heroLeadStyle }}">Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas. Sign up online and stay until 30 June 2026.</span>
+          <span style="{{ heroNoteStyle }}">New or moving residents in NSW, SA or VIC only. Not available if you've had a credit for the same fuel and address in the last 12 months.</span>
+          <div style="position:relative;width:100%;max-width:560px;margin-top:4px">
+            <div onClick="{{ searchAction }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:40px;box-shadow:0 2px 20px rgba(0,0,0,.08);padding:8px 8px 8px 24px;cursor:text;min-width:0">
+              <div style="width:24px;height:24px;flex-shrink:0;color:#505050;display:flex;align-items:center;justify-content:center"><cp-icon name="SearchSolid" size="24"></cp-icon></div>
+              <input ref="{{ searchInputRef }}" class="cp-input" value="{{ searchValue }}" placeholder="Find plans for your home..." onFocus="{{ onSearchFocus }}" onChange="{{ onSearchInput }}" autoComplete="off" style="flex-grow:1;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:17px;line-height:26px;color:#232323;padding:0;caret-color:#505050">
+              <sc-if value="{{ showClear }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ clearSearch }}" style="width:30px;height:30px;flex-shrink:0;border-radius:50%;background:#505050;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"></path></svg>
+                </div>
+              </sc-if>
+              <sc-if value="{{ showCheck }}" hint-placeholder-val="{{ false }}">
+                <div style="width:30px;height:30px;flex-shrink:0;border-radius:50%;background:#8BB832;display:flex;align-items:center;justify-content:center;animation:cpPop .32s cubic-bezier(.34,1.56,.64,1)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>
+                </div>
+              </sc-if>
+              <button onClick="{{ searchAction }}" style="border:0;background:#FFB233;border-radius:40px;height:52px;padding:0 32px;font-family:gordita;font-weight:600;font-size:16px;color:#232323;cursor:pointer;flex-shrink:0">{{ searchButtonLabel }}</button>
+            </div>
+            <sc-if value="{{ showDropdown }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:30;background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.14);overflow:hidden;animation:cpDrop .2s ease">
+                <sc-for list="{{ suggestions }}" as="sug" hint-placeholder-count="3">
+                  <div onClick="{{ sug.onSelect }}" style="display:flex;align-items:center;gap:12px;padding:14px 20px;cursor:pointer;border-bottom:1px solid #F4F4F4" style-hover="background:#F7F7F7">
+                    <div style="width:20px;height:20px;flex-shrink:0;color:#909090;display:flex;align-items:center;justify-content:center">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+                    </div>
+                    <span style="font-family:gordita;font-weight:500;font-size:15px;color:#232323;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sug.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:{{ proofTopDisplay }};align-items:center;gap:8px;margin-top:4px">
+            <div style="width:22px;height:22px;color:#232323;display:flex;align-items:center;justify-content:center"><cp-icon name="VerifiedUserSolid" size="22"></cp-icon></div>
+            <span style="font-weight:500;font-size:13px;line-height:20px;color:#000">No lock-in contract, no exit fees.</span>
+          </div>
+        </div><div style="{{ heroImageStyle }}">
+          <img src="assets/comfy-credits.png" alt="Comfy Credits" style="width:100%;max-width:{{ heroImgMax }};height:auto;display:block"><div style="display:{{ proofImgDisplay }};align-items:center;gap:8px;margin-top:-20px">
+            <div style="width:22px;height:22px;color:#232323;display:flex;align-items:center;justify-content:center"><cp-icon name="VerifiedUserSolid" size="22"></cp-icon></div>
+            <span style="font-weight:500;font-size:13px;line-height:20px;color:#000">No lock-in contract, no exit fees.</span>
+          </div>
+          
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- Grey results container -->
+  <div data-results="" style="background:#F1F1F1;padding:{{ resultsPad }};margin-top:{{ resultsMt }};border-radius:{{ resultsRadius }};display:flex;justify-content:center">
+   <div style="width:100%;max-width:{{ contentMax }};padding:{{ innerPad }};display:flex;flex-direction:column;gap:{{ resultsGap }}">
+
+    <!-- Filter card -->
+    
+
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+      <span style="font-weight:400;font-size:14px;color:#505050">{{ showLead }}<span style="font-weight:700;color:#232323">{{ showBold }}</span></span>
+    </sc-if>
+
+    <!-- Carousel -->
+    <div style="{{ filterWrap }}">
+      <span style="display:{{ filterLabelDisplay }};font-weight:500;font-size:16px;line-height:24px;color:#000;white-space:nowrap">Filter plans by</span>
+      <div ref="{{ segRef }}" style="position:relative;display:flex;border-radius:28px;width:{{ segWidth }};height:56px;flex-shrink:0;background-color:{{ segTrackBg }};box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid {{ segTrackBorder }}">
+        <div ref="{{ thumbRef }}" style="position:absolute;top:0;left:0;height:100%;width:120px;transform:translateX(4px);border-radius:28px;background:#232323;border:6px solid transparent;background-clip:padding-box;box-sizing:border-box;transition:transform .42s cubic-bezier(.34,1.4,.5,1),width .42s cubic-bezier(.34,1.4,.5,1);z-index:0;pointer-events:none"></div>
+        <sc-for list="{{ fuelOptions }}" as="opt" hint-placeholder-count="3">
+          <button onClick="{{ opt.onSelect }}" style="position:relative;z-index:1;{{ segBtnFlex }};border:0;background:transparent;cursor:pointer;border-radius:28px;height:56px;font-family:gordita;font-weight:600;font-size:14px;white-space:nowrap;color:{{ opt.fg }};transition:color .3s ease">{{ opt.name }}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ showAddonFilters }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;gap:16px">
+        <sc-for list="{{ addonList }}" as="ad" hint-placeholder-count="3">
+          <label onClick="{{ ad.onToggle }}" style="{{ ad.wrapStyle }}">
+            <span style="width:20px;height:20px;border-radius:4px;border:1.5px solid {{ ad.border }};background:{{ ad.bg }};display:{{ ad.squareDisplay }};align-items:center;justify-content:center;flex-shrink:0">
+              <sc-if value="{{ ad.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if>
+            </span>
+            <span style="font-weight:400;font-size:14px;color:{{ ad.textColor }};transition:color .25s ease">{{ ad.name }}</span>
+          </label>
+        </sc-for>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isWide }}" hint-placeholder-val="{{ false }}">
+        <div style="{{ resultsBarStyle }}">
+          <span style="font-weight:400;font-size:15px;color:#505050;white-space:nowrap">{{ showLead }}<span style="font-weight:700;color:#232323">{{ showBold }}</span></span>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ scrollLeft }}" aria-label="Previous" style="{{ prevArrowStyle }}" style-hover="box-shadow:0 4px 14px rgba(0,0,0,.16)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"></path></svg></button>
+            <button onClick="{{ scrollRight }}" aria-label="Next" style="{{ nextArrowStyle }}" style-hover="box-shadow:0 4px 14px rgba(0,0,0,.16)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg></button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="position:relative;width:100vw;margin-left:calc(50% - 50vw)">
+      <div class="cp-scroll" ref="{{ scrollRef }}" tabindex="0" onKeyDown="{{ onCarouselKey }}" onMouseDown="{{ onDragStart }}" onMouseMove="{{ onCarMove }}" onScroll="{{ onCarScroll }}" style="display:flex;gap:{{ carGap }};overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-left:{{ carScrollPad }};margin:{{ carMargin }};padding:{{ carPad }};cursor:{{ carCursor }};outline:none;-webkit-mask-image:{{ carMask }};mask-image:{{ carMask }}">
+      <sc-for list="{{ plans }}" as="plan" hint-placeholder-count="3">
+        <div data-plan-id="{{ plan.id }}" style="scroll-snap-align: start; flex-shrink: 0; width: {{ plan.cardWidth }}; --cw: {{ plan.slotPx }}; border-radius: 32px; background: #fff; border: {{ plan.cardBorder }}; padding: 32px 16px; display: flex; flex-direction: column; gap: 32px; animation: {{ plan.anim }}">
+
+          <!-- Card header -->
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+            <div style="height:96px;display:flex;align-items:center;justify-content:center;position:relative;width:100%">
+              <sc-if value="{{ plan.isLogo }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/everyday-rewards.png" alt="Everyday Rewards" style="height:88px;width:106px;display:block">
+              </sc-if>
+              <sc-if value="{{ plan.showOffer }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/pictogram-offer.svg" alt="" width="92" height="92" style="display:block">
+              </sc-if>
+              <sc-if value="{{ plan.showBolt }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/pictogram-bolt.svg" alt="" width="86" height="86" style="display:block">
+              </sc-if>
+              <sc-if value="{{ plan.showSolar }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/pictogram-solar.svg" alt="" width="92" height="92" style="display:block">
+              </sc-if>
+              <sc-if value="{{ plan.showBattery }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/pictogram-battery.svg" alt="" width="92" height="92" style="display:block">
+              </sc-if>
+              <sc-if value="{{ plan.showNight }}" hint-placeholder-val="{{ false }}">
+                <img src="assets/pictogram-night.svg" alt="" width="92" height="92" style="display:block">
+              </sc-if>
+              <sc-if value="{{ plan.placeholderIcon }}" hint-placeholder-val="">
+                <div style="width:88px;height:88px;border-radius:20px;background:{{ plan.tint }};display:flex;align-items:center;justify-content:center;color:{{ plan.tintFg }}">
+                  <cp-icon name="{{ plan.placeholderIcon }}" size="44"></cp-icon>
+                </div>
+              </sc-if>
+              <sc-if value="{{ plan.tag }}" hint-placeholder-val="">
+                <span style="position:absolute;top:4px;right:24px;background:{{ plan.tagColor }};color:#fff;font-weight:700;font-size:13px;line-height:18px;padding:5px 11px;border-radius:16px 16px 16px 4px;white-space:nowrap">{{ plan.tag }}</span>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;padding:0 12px">
+              <div style="min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center"><span style="font-weight:700;font-size:16px;line-height:24px;color:#232323">{{ plan.name }}</span></div>
+              <div style="height:72px;padding-top:8px;text-align:center"><span style="font-weight:400;font-size:14px;line-height:24px;color:#505050">{{ plan.tagline }}</span></div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div style="display: flex; flex-direction: column; gap: 56px">
+
+            <!-- Pricing: Electricity -->
+            <sc-if value="{{ plan.showElec }}" hint-placeholder-val="{{ true }}">
+            <div style="border-radius: 24px; background: #F6F6F6; padding: 24px; display: flex; flex-direction: column; gap: 16px; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-weight:500;font-size:16px;line-height:24px;color:#232323">Electricity</span>
+                <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center">
+                  <cp-icon name="Electricity" size="28"></cp-icon>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:baseline;gap:2px">
+                  <span style="font-weight:700;font-size:30px;line-height:34px;color:#232323">{{ plan.discount }}</span>
+                  <span style="font-weight:700;font-size:16px;color:#232323">%</span>
+                </div>
+                <span style="font-weight:400;font-size:12px;line-height:20px;color:#505050">less than the {{ plan.ref }} reference price</span>
+              </div>
+              <div style="height:1px;background:rgba(0,0,0,.1)"></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:flex-end;gap:4px">
+                  <span style="font-weight: 700; font-size: 24px; line-height: 32px; color: #232323">{{ plan.yearly }}</span>
+                  <span style="font-weight:700;font-size:14px;color:#232323;padding-bottom:3px">/year</span>
+                  <div style="width:18px;height:18px;color:#A0A0A0;display:flex;align-items:center;justify-content:center;padding-bottom:2px">
+                    <cp-icon name="Info" size="18"></cp-icon>
+                  </div>
+                </div>
+                <span style="font-weight:400;font-size:12px;line-height:20px;color:#505050">{{ plan.est }}</span>
+                <div style="min-height:20px;margin-top:4px;display:flex">
+                  <sc-if value="{{ plan.showCreditLink }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ plan.onCredit }}" style="align-self: flex-start; font-weight: 500; font-size: 12px; line-height: 20px; color: #797979; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: rgba(0,0,0,.55); text-decoration-thickness: 2px; text-underline-offset: 4px; cursor: pointer">Price estimate excludes credits</span>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- Pricing: Natural Gas -->
+            <div style="display:grid;grid-template-rows:{{ plan.gasGrid }};margin-top:{{ plan.gasMt }};opacity:{{ plan.gasOpacity }};transition:{{ plan.gasTrans }}">
+            <div style="overflow:hidden;min-height:0">
+            <div style="border-radius:16px;background:#F6F6F6;padding:24px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-weight:500;font-size:16px;line-height:24px;color:#232323">Natural Gas</span>
+                <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center">
+                  <cp-icon name="Gas" size="28"></cp-icon>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:flex-end;gap:4px">
+                  <span style="font-weight:700;font-size:28px;line-height:32px;color:#232323">{{ plan.gasYearly }}</span>
+                  <span style="font-weight:700;font-size:14px;color:#232323;padding-bottom:3px">/year</span>
+                  <div style="width:18px;height:18px;color:#A0A0A0;display:flex;align-items:center;justify-content:center;padding-bottom:2px">
+                    <cp-icon name="Info" size="18"></cp-icon>
+                  </div>
+                </div>
+                <span style="font-weight:400;font-size:12px;line-height:20px;color:#505050">{{ plan.gasEst }}</span>
+                <div style="min-height:20px;margin-top:4px;display:flex">
+                  <sc-if value="{{ plan.showCreditLink }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ plan.onCredit }}" style="align-self:flex-start;font-weight:500;font-size:12px;line-height:20px;color:#797979;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:rgba(0,0,0,.55);text-decoration-thickness:2px;text-underline-offset:4px;cursor:pointer">Price estimate excludes credits</span>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+            </div>
+            </div>
+
+            <!-- What's included -->
+            <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 16px; padding-left: 12px; padding-right: 12px">
+              <span style="display:block;min-height:48px;font-weight:500;font-size:16px;line-height:24px;color:#232323">{{ plan.includedTitle }}</span>
+              <div style="display:flex;flex-direction:column;gap:{{ plan.secGap }};{{ plan.secBorder }}">
+                <sc-for list="{{ plan.included }}" as="perk" hint-placeholder-count="2">
+                  <div onClick="{{ perk.onOpen }}" style="{{ perk.rowStyle }}" style-hover="{{ perk.rowHover }}">
+                    <sc-if value="{{ perk.inline }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+                      <cp-icon name="{{ perk.icon }}" size="24"></cp-icon>
+                    </div>
+                    <span style="font-weight:400;font-size:14px;line-height:24px;color:#505050;text-decoration:{{ perk.deco }};text-decoration-color:rgba(0,0,0,.4);text-decoration-thickness:1.4px;text-underline-offset:auto;text-underline-position:from-font">{{ perk.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ perk.detailed }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+                      <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center"><cp-icon name="{{ perk.icon }}" size="28"></cp-icon></div>
+                      <sc-if value="{{ perk.modalIndicator }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:5px;color:#505050"><span style="font-size:13px;font-weight:500;color:#505050">{{ perk.indLabel }}</span><div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;transform:{{ perk.indRotate }}"><cp-icon name="{{ perk.indIcon }}" size="18"></cp-icon></div></div>
+                      </sc-if>
+                    </div>
+                    <span style="font-weight:400;font-size:16px;line-height:24px;color:#232323">{{ perk.text }}</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Things you can add -->
+            <sc-if value="{{ plan.showAddons }}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 16px; padding-left: 12px; padding-right: 12px">
+              <span style="font-weight:500;font-size:16px;line-height:24px;color:#232323">Things you can add.</span>
+              <div style="display:flex;flex-direction:column;gap:{{ plan.secGap }};min-height:168px;{{ plan.secBorder }}">
+                <sc-for list="{{ plan.addable }}" as="perk" hint-placeholder-count="2">
+                  <div onClick="{{ perk.onOpen }}" style="{{ perk.rowStyle }}" style-hover="{{ perk.rowHover }}">
+                    <sc-if value="{{ perk.inline }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+                      <cp-icon name="{{ perk.icon }}" size="24"></cp-icon>
+                    </div>
+                    <span style="font-weight:400;font-size:14px;line-height:24px;color:#505050;text-decoration:{{ perk.deco }};text-decoration-color:rgba(0,0,0,.4);text-decoration-thickness:1.4px;text-underline-offset:auto;text-underline-position:from-font">{{ perk.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ perk.detailed }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+                      <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center"><cp-icon name="{{ perk.icon }}" size="28"></cp-icon></div>
+                      <sc-if value="{{ perk.modalIndicator }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:5px;color:#505050"><span style="font-size:13px;font-weight:500;color:#505050">{{ perk.indLabel }}</span><div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;transform:{{ perk.indRotate }}"><cp-icon name="{{ perk.indIcon }}" size="18"></cp-icon></div></div>
+                      </sc-if>
+                    </div>
+                    <span style="font-weight:400;font-size:16px;line-height:24px;color:#232323">{{ perk.text }}</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+
+          <!-- Rate card accordion -->
+          <div style="padding:0 16px">
+            <sc-if value="{{ plan.showElec }}" hint-placeholder-val="{{ true }}">
+            <div style="border-top:1px solid #E3E3E3">
+              <div onClick="{{ plan.onToggleRates }}" style="display: flex; align-items: center; justify-content: space-between; padding: 20px 0; cursor: pointer; padding-top: 24px; padding-bottom: 24px">
+                <span style="font-weight: 500; font-size: 16px; line-height: 24px; color: #232323">Electricity rates</span>
+                <div style="position:relative;width:22px;height:22px;flex-shrink:0">
+                  <span style="position:absolute;top:10px;left:2px;right:2px;height:2px;background:#232323;border-radius:1px"></span>
+                  <span style="position:absolute;left:10px;top:2px;bottom:2px;width:2px;background:#232323;border-radius:1px;transition:transform .25s ease;transform:scaleY({{ plan.ratesVbar }})"></span>
+                </div>
+              </div>
+              <div style="display:grid;transition:grid-template-rows .32s ease;grid-template-rows:{{ plan.ratesRows }}">
+                <div style="overflow:hidden">
+                  <div style="display:flex;flex-direction:column;gap:24px;padding-bottom:24px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight: 700; font-size: 14px; color: #232323">Supply charge</span><span style="font-weight: 700; font-size: 14px; color: #232323">c/day</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Daily</span><span style="font-size: 14px; color: #232323">103</span></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight: 700; font-size: 14px; color: #232323">Usage charges</span><span style="font-weight: 700; font-size: 14px; color: #232323">c/kWh</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Peak</span><span style="font-size: 14px; color: #232323">53.8</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Shoulder</span><span style="font-size: 14px; color: #232323">32.1</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Off-peak</span><span style="font-size: 14px; color: #232323">0</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Controlled Load 1 Usage</span><span style="font-size: 14px; color: #232323">21.22</span></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight: 700; font-size: 14px; color: #232323">Feed-in</span><span style="font-weight: 700; font-size: 14px; color: #232323">c/kWh</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Peak</span><span style="font-size: 14px; color: #232323">53.8</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Off-peak</span><span style="font-size: 14px; color: #232323">18.4</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Super off-peak</span><span style="font-size: 14px; color: #232323">0</span></div>
+                    </div>
+                    <span style="font-weight: 400; font-size: 12px; line-height: 22px; color: #737373">All rates are variable, rounded up to 2 decimal places and inclusive of GST. Concessions are not included.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-rows:{{ plan.gasAccGrid }};opacity:{{ plan.gasOpacity }};transition:{{ plan.gasAccTrans }}">
+            <div style="overflow:hidden;min-height:0">
+            <div style="border-top:1px solid #E3E3E3">
+              <div onClick="{{ plan.onToggleGasRates }}" style="display:flex;align-items:center;justify-content:space-between;padding:20px 0;cursor:pointer">
+                <span style="font-weight: 500; font-size: 16px; line-height: 24px; color: #232323">Natural Gas rates</span>
+                <div style="position:relative;width:22px;height:22px;flex-shrink:0">
+                  <span style="position:absolute;top:10px;left:2px;right:2px;height:2px;background:#232323;border-radius:1px"></span>
+                  <span style="position:absolute;left:10px;top:2px;bottom:2px;width:2px;background:#232323;border-radius:1px;transition:transform .25s ease;transform:scaleY({{ plan.gasRatesVbar }})"></span>
+                </div>
+              </div>
+              <div style="display:grid;transition:grid-template-rows .32s ease;grid-template-rows:{{ plan.gasRatesRows }}">
+                <div style="overflow:hidden">
+                  <div style="display:flex;flex-direction:column;gap:24px;padding-bottom:24px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight: 700; font-size: 14px; color: #232323">Supply charge</span><span style="font-weight: 700; font-size: 14px; color: #232323">c/day</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">Daily</span><span style="font-size: 14px; color: #232323">81.4</span></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight: 700; font-size: 14px; color: #232323">Usage charges</span><span style="font-weight: 700; font-size: 14px; color: #232323">c/MJ</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">0–30 MJ/day</span><span style="font-size: 14px; color: #232323">4.62</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">30–60 MJ/day</span><span style="font-size: 14px; color: #232323">3.85</span></div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-size: 14px; color: #737373">60+ MJ/day</span><span style="font-size: 14px; color: #232323">2.97</span></div>
+                    </div>
+                    <span style="font-weight: 400; font-size: 12px; line-height: 22px; color: #737373">All rates are variable, rounded up to 2 decimal places and inclusive of GST. Concessions are not included.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Bottom -->
+          <div style="display:flex;flex-direction:column;gap:32px">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <button style="border:0;background:#FFB233;border-radius:24px;height:48px;font-family:gordita;font-weight:600;font-size:16px;color:#232323;cursor:pointer">Enter address</button>
+              <div style="padding:0 16px;text-align:center"><span style="font-weight:500;font-size:14px;line-height:24px;color:#505050">No lock-in contracts. You can change plans anytime.</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <a href="#" style="font-weight:400;font-size:14px;color:#232323;text-decoration:underline;text-underline-offset:3px">Energy fact sheets</a>
+              <a href="#" style="font-weight:400;font-size:14px;color:#232323;text-decoration:underline;text-underline-offset:3px">Terms &amp; conditions</a>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      </div>
+    </div>
+    <sc-if value="{{ showRail }}" hint-placeholder-val="{{ false }}">
+      <div onMouseDown="{{ onRailDown }}" style="max-width:420px;width:100%;margin:12px auto 0;padding:8px {{ sidePad }};box-sizing:border-box;cursor:pointer">
+        <div data-rail-track="" style="position:relative;height:6px;border-radius:3px;background:#E0E0E0">
+          <div style="{{ railThumbStyle }};pointer-events:none"></div>
+        </div>
+      </div>
+    </sc-if>
+   </div>
+  </div>
+
+  <!-- Feature modal -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="{{ modalOverlayStyle }}">
+      <div onClick="{{ stop }}" style="{{ modalSheetStyle }}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:flex-start">
+            <cp-icon name="{{ modal.icon }}" size="44"></cp-icon>
+          </div>
+          <div onClick="{{ closeModal }}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"></path></svg>
+          </div>
+        </div>
+        <span style="font-weight:700;font-size:28px;line-height:34px;color:#232323;letter-spacing:-.01em;text-wrap:balance">{{ modal.title }}</span>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ modal.body }}" as="blk" hint-placeholder-count="2">
+            <sc-if value="{{ blk.isHead }}" hint-placeholder-val="{{ false }}">
+              <span style="font-weight:700;font-size:18px;line-height:26px;color:#232323;margin-top:4px">{{ blk.text }}</span>
+            </sc-if>
+            <sc-if value="{{ blk.isPara }}" hint-placeholder-val="{{ true }}">
+              <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">{{ blk.text }}</span>
+            </sc-if>
+            <sc-if value="{{ blk.isList }}" hint-placeholder-val="{{ false }}">
+              <ul style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ blk.items }}" as="it" hint-placeholder-count="3">
+                  <li style="font-weight:400;font-size:16px;line-height:26px;color:#505050">{{ it }}</li>
+                </sc-for>
+              </ul>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;campaign&quot;,&quot;centered&quot;,&quot;imageLeft&quot;,&quot;minimal&quot;],&quot;default&quot;:&quot;campaign&quot;,&quot;tsType&quot;:&quot;'campaign' | 'centered' | 'imageLeft' | 'minimal'&quot;},&quot;filterLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;bar&quot;,&quot;card&quot;,&quot;pills&quot;,&quot;split&quot;],&quot;default&quot;:&quot;bar&quot;,&quot;tsType&quot;:&quot;'bar' | 'card' | 'pills' | 'split'&quot;},&quot;featureLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;list&quot;,&quot;divided&quot;,&quot;label&quot;,&quot;hover&quot;,&quot;boxed&quot;,&quot;chips&quot;,&quot;leftbar&quot;,&quot;tinted&quot;],&quot;default&quot;:&quot;list&quot;,&quot;tsType&quot;:&quot;'list' | 'divided' | 'label' | 'hover' | 'boxed' | 'chips' | 'leftbar' | 'tinted'&quot;},&quot;detailIndicator&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chevron&quot;,&quot;info&quot;],&quot;default&quot;:&quot;chevron&quot;,&quot;tsType&quot;:&quot;'chevron' | 'info'&quot;},&quot;featureDivider&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;rowSpacing&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cozy&quot;,&quot;comfortable&quot;,&quot;spacious&quot;],&quot;default&quot;:&quot;comfortable&quot;,&quot;tsType&quot;:&quot;'cozy' | 'comfortable' | 'spacious'&quot;},&quot;creditOffer&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;edgeNav&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;cardsTablet&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:3.5,&quot;min&quot;:1.5,&quot;max&quot;:3.5,&quot;step&quot;:0.5,&quot;tsType&quot;:&quot;number&quot;},&quot;cardsDesktop&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:3.5,&quot;min&quot;:2.5,&quot;max&quot;:5,&quot;step&quot;:0.5,&quot;tsType&quot;:&quot;number&quot;},&quot;showAddonFilters&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { fuel: 'Electricity', addons: { Solar:false, EV:false, Battery:false }, ratesOpen: false, gasRatesOpen: false, activeModal: null, modalClosing: false, searchPhase: 'idle', searchValue: '', car: { left:0, max:0, idx:0, n:0, cw:0, sw:0 }, vw: (typeof window !== 'undefined' ? window.innerWidth : 1280) };
+
+  // --- Responsive: track viewport width so layout can branch mobile / tablet / desktop ---
+  componentDidMount(){
+    this._onResize = () => {
+      const w = window.innerWidth;
+      if (Math.abs(w - (this.state.vw || 0)) >= 1) this.setState({ vw: w });
+      this.positionThumb(true);
+    };
+    window.addEventListener('resize', this._onResize, { passive: true });
+    this._onKey = (e) => { if (e.key === 'Escape' && this.state.activeModal && !this.state.modalClosing) this.closeModal(); };
+    window.addEventListener('keydown', this._onKey);
+    this._onResize();
+    requestAnimationFrame(() => this.positionThumb(false));
+    setTimeout(() => this.positionThumb(false), 250);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this.positionThumb(false));
+    const mk = (d) => "url(\"data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"46\" height=\"46\"><circle cx=\"23\" cy=\"23\" r=\"22\" fill=\"white\" stroke=\"#DADADA\"/><path d=\"' + d + '\" fill=\"none\" stroke=\"#232323\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>') + "\") 23 23, pointer";
+    this._curL = mk('M26 15 L18 23 L26 31');
+    this._curR = mk('M20 15 L28 23 L20 31');
+  }
+  componentDidUpdate(){ this.positionThumb(true); this.syncCar(); }
+  positionThumb(animate){
+    const seg = this._segEl, thumb = this._thumbEl;
+    if (!seg || !thumb) return;
+    const btns = seg.querySelectorAll('button');
+    const idx = Math.max(0, ['Electricity','Gas','Both'].indexOf(this.state.fuel));
+    const b = btns[idx];
+    if (!b) return;
+    if (b.offsetWidth < 24) return;
+    const TRANS = 'transform .42s cubic-bezier(.34,1.4,.5,1),width .42s cubic-bezier(.34,1.4,.5,1)';
+    if (!animate) thumb.style.transition = 'none';
+    thumb.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+    thumb.style.width = b.offsetWidth + 'px';
+    if (!animate) { void thumb.offsetWidth; thumb.style.transition = TRANS; }
+  }
+
+  // --- Fake address search: idle (blinking caret) → typing (auto-types) → open (autocomplete) → success (green check) ---
+  startSearch(){
+    if (this.state.searchPhase !== 'idle') return;
+    const target = '6 nerli st';
+    this.setState({ searchPhase: 'typing', searchValue: '' });
+    let i = 0;
+    if (this._typeTimer) clearInterval(this._typeTimer);
+    this._typeTimer = setInterval(() => {
+      i++;
+      this.setState({ searchValue: target.slice(0, i) });
+      if (i >= target.length) {
+        clearInterval(this._typeTimer); this._typeTimer = null;
+        this._openTimer = setTimeout(() => this.setState({ searchPhase: 'open' }), 320);
+      }
+    }, 95);
+  }
+  clearSearch(e){
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (this._typeTimer) { clearInterval(this._typeTimer); this._typeTimer = null; }
+    if (this._openTimer) { clearTimeout(this._openTimer); this._openTimer = null; }
+    this.setState({ searchPhase: 'idle', searchValue: '' });
+  }
+  pickAddress(addr){
+    if (this._typeTimer) { clearInterval(this._typeTimer); this._typeTimer = null; }
+    if (this._openTimer) { clearTimeout(this._openTimer); this._openTimer = null; }
+    this.setState({ searchPhase: 'success', searchValue: addr });
+    const inp = this._searchInput && this._searchInput.current;
+    if (inp) inp.blur();
+  }
+  onCarouselKey(e){
+    const k = e.key;
+    if (k !== 'ArrowRight' && k !== 'ArrowLeft') return;
+    const el = document.querySelector('.cp-scroll');
+    if (!el) return;
+    e.preventDefault();
+    const cards = [...el.querySelectorAll('[data-plan-id]')];
+    if (!cards.length) return;
+    const cRect = el.getBoundingClientRect(), padL = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0, cur = el.scrollLeft;
+    const targets = cards.map(c => cur + (c.getBoundingClientRect().left - cRect.left) - padL);
+    let idx = 0, best = Infinity;
+    targets.forEach((t, i) => { const d = Math.abs(t - cur); if (d < best) { best = d; idx = i; } });
+    let ni = idx + (k === 'ArrowRight' ? 1 : -1);
+    ni = Math.max(0, Math.min(cards.length - 1, ni));
+    this.smoothScrollX(el, targets[ni], 420);
+  }
+  onDragStart(e){
+    if (e.button !== undefined && e.button !== 0) return;
+    const el = this._scrollEl || document.querySelector('.cp-scroll');
+    if (!el) return;
+    const startX = e.clientX, startScroll = el.scrollLeft;
+    let moved = false;
+    el.style.scrollSnapType = 'none';
+    el.style.cursor = ((this.props.edgeNav ?? false) && this._edgeDir) ? (this._edgeDir < 0 ? this._curL : this._curR) : 'grabbing';
+    document.body.style.userSelect = 'none';
+    this._onDragMove = (ev) => {
+      const d = ev.clientX - startX;
+      if (Math.abs(d) > 3) moved = true;
+      el.scrollLeft = startScroll - d;
+    };
+    this._onDragEnd = () => {
+      window.removeEventListener('mousemove', this._onDragMove);
+      window.removeEventListener('mouseup', this._onDragEnd);
+      this._onDragMove = null; this._onDragEnd = null;
+      el.style.cursor = ((this.props.edgeNav ?? false) && this._edgeDir) ? (this._edgeDir < 0 ? this._curL : this._curR) : '';
+      document.body.style.userSelect = '';
+      if (moved) {
+        const sup = (ce) => { ce.stopPropagation(); ce.preventDefault(); window.removeEventListener('click', sup, true); };
+        window.addEventListener('click', sup, true);
+        this.snapNearest(el);
+      } else { el.style.scrollSnapType = ''; if ((this.props.edgeNav ?? false) && this._edgeDir) this.scrollCarousel(this._edgeDir); }
+    };
+    window.addEventListener('mousemove', this._onDragMove);
+    window.addEventListener('mouseup', this._onDragEnd);
+  }
+  // Edge-cursor nav (tweak): near the carousel's left/right edge — when scrollable that way — the
+  // cursor becomes a prev/next arrow and a click (not a drag) advances one card.
+  onCarMove(e){
+    const el = this._scrollEl; if (!el || this._railDragging) return;
+    if (!(this.props.edgeNav ?? false)) { this._edgeDir = 0; return; }
+    const rect = el.getBoundingClientRect();
+    const zone = Math.min(170, rect.width * 0.2);
+    const x = e.clientX - rect.left;
+    const canL = el.scrollLeft > 4;
+    const canR = el.scrollLeft < el.scrollWidth - el.clientWidth - 4;
+    if (x < zone && canL) { el.style.cursor = this._curL; this._edgeDir = -1; }
+    else if (x > rect.width - zone && canR) { el.style.cursor = this._curR; this._edgeDir = 1; }
+    else { el.style.cursor = 'grab'; this._edgeDir = 0; }
+  }
+  // Bottom scrollbar drag-to-scrub.
+  onRailDown(e){
+    const wrap = e.currentTarget;
+    const track = wrap.querySelector('[data-rail-track]') || wrap;
+    const thumb = track.firstElementChild;
+    const el = this._scrollEl; if (!el) return;
+    const rect = track.getBoundingClientRect();
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll <= 0) return;
+    const visPct = Math.max(14, Math.min(100, el.clientWidth / el.scrollWidth * 100));
+    this._railDragging = true;
+    el.style.scrollSnapType = 'none';
+    if (thumb) thumb.style.transition = 'none';
+    const seek = (cx) => { const f = Math.min(1, Math.max(0, (cx - rect.left) / rect.width)); el.scrollLeft = f * maxScroll; if (thumb) thumb.style.left = (f * (100 - visPct)) + '%'; };
+    seek(e.clientX);
+    this._railMove = (ev) => seek(ev.clientX);
+    this._railUp = () => { window.removeEventListener('mousemove', this._railMove); window.removeEventListener('mouseup', this._railUp); this._railDragging = false; el.style.scrollSnapType = ''; if (thumb) thumb.style.transition = ''; this.readCar(); };
+    window.addEventListener('mousemove', this._railMove); window.addEventListener('mouseup', this._railUp);
+    e.preventDefault();
+  }
+  snapNearest(el){
+    const cards = [...el.querySelectorAll('[data-plan-id]')];
+    if (!cards.length) { el.style.scrollSnapType = ''; return; }
+    const cRect = el.getBoundingClientRect();
+    const padL = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0;
+    const cur = el.scrollLeft;
+    let best = Infinity, bt = cur;
+    cards.forEach(c => { const t = cur + (c.getBoundingClientRect().left - cRect.left) - padL; const d = Math.abs(t - cur); if (d < best) { best = d; bt = t; } });
+    this.smoothScrollX(el, bt, 360);
+  }
+  onCarouselHover(e){
+    const el = this._scrollEl; if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const margin = Math.max(40, (window.innerWidth - (this._trackPx || 1280)) / 2);
+    const zone = margin + 60;
+    const canL = el.scrollLeft > 4;
+    const canR = el.scrollLeft < (el.scrollWidth - el.clientWidth - 4);
+    this._setArrow(this._lArrow, (e.clientX - rect.left) < zone && canL);
+    this._setArrow(this._rArrow, (rect.right - e.clientX) < zone && canR);
+  }
+  onCarouselLeave(){ this._setArrow(this._lArrow, false); this._setArrow(this._rArrow, false); }
+  _setArrow(el, on){ if (!el) return; el.style.opacity = on ? '1' : '0'; el.style.pointerEvents = on ? 'auto' : 'none'; }
+  searchAction(){
+    if (this.state.searchPhase === 'success') { this.viewPlans(); return; }
+    const inp = this._searchInput && this._searchInput.current;
+    if (inp) inp.focus(); else this.startSearch();
+  }
+  onSearchFocus(){
+    if (this.state.searchPhase === 'idle') this.startSearch();
+  }
+  onSearchInput(e){
+    // User typed manually — stop the demo auto-typer and reflect their input.
+    if (this._typeTimer) { clearInterval(this._typeTimer); this._typeTimer = null; }
+    if (this._openTimer) { clearTimeout(this._openTimer); this._openTimer = null; }
+    const v = e && e.target ? e.target.value : '';
+    this.setState({ searchValue: v, searchPhase: v ? 'open' : 'typing' });
+  }
+  viewPlans(){
+    const el = document.querySelector('[data-results]');
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!el || !scroller) return;
+    const target = el.getBoundingClientRect().top + scroller.scrollTop - 12;
+    const start = scroller.scrollTop, dist = target - start, t0 = performance.now(), DUR = 620;
+    const ease = p => 1 - Math.pow(1 - p, 3);
+    if (this._vraf) cancelAnimationFrame(this._vraf);
+    const step = now => {
+      const p = Math.min(1, (now - t0) / DUR);
+      scroller.scrollTop = start + dist * ease(p);
+      if (p < 1) this._vraf = requestAnimationFrame(step); else this._vraf = 0;
+    };
+    this._vraf = requestAnimationFrame(step);
+  }
+
+  openModal(key){
+    if (this._closeTimer) { clearTimeout(this._closeTimer); this._closeTimer = null; }
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    this._scrollY = y;
+    const b = document.body;
+    this._prevBody = { position: b.style.position, top: b.style.top, left: b.style.left, right: b.style.right, width: b.style.width, overflow: b.style.overflow };
+    b.style.position = 'fixed';
+    b.style.top = (-y) + 'px';
+    b.style.left = '0';
+    b.style.right = '0';
+    b.style.width = '100%';
+    b.style.overflow = 'hidden';
+    this.setState({ activeModal: key, modalTop: y, modalClosing: false });
+  }
+  _restoreScroll(){
+    const b = document.body, pv = this._prevBody || {};
+    b.style.position = pv.position || '';
+    b.style.top = pv.top || '';
+    b.style.left = pv.left || '';
+    b.style.right = pv.right || '';
+    b.style.width = pv.width || '';
+    b.style.overflow = pv.overflow || '';
+    window.scrollTo(0, this._scrollY || 0);
+  }
+  closeModal(){
+    if (this.state.modalClosing) return;
+    this.setState({ modalClosing: true });
+    this._closeTimer = setTimeout(() => {
+      this._restoreScroll();
+      this._closeTimer = null;
+      this.setState({ activeModal: null, modalClosing: false });
+    }, 300);
+  }
+  componentWillUnmount(){ if (this._onKey) window.removeEventListener('keydown', this._onKey); if (this._closeTimer) clearTimeout(this._closeTimer); if (this._onResize) window.removeEventListener('resize', this._onResize); if (this._onDragMove) window.removeEventListener('mousemove', this._onDragMove); if (this._onDragEnd) window.removeEventListener('mouseup', this._onDragEnd); this._restoreScroll(); }
+
+  // Arrow-button nav: advance the carousel by one card (reuses the snap-target math from keyboard nav).
+  scrollCarousel(dir){
+    const el = document.querySelector('.cp-scroll');
+    if (!el) return;
+    const cards = [...el.querySelectorAll('[data-plan-id]')];
+    if (!cards.length) return;
+    const cRect = el.getBoundingClientRect();
+    const padL = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0;
+    const cur = el.scrollLeft;
+    const targets = cards.map(c => cur + (c.getBoundingClientRect().left - cRect.left) - padL);
+    let idx = 0, best = Infinity;
+    targets.forEach((t, i) => { const d = Math.abs(t - cur); if (d < best) { best = d; idx = i; } });
+    let ni = Math.max(0, Math.min(cards.length - 1, idx + dir));
+    this.smoothScrollX(el, targets[ni], 420);
+  }
+  selectFuel(name){
+    const from = this.state.fuel;
+    if (name === from) return;
+    const addonIds = [];
+    ['Solar','EV','Battery'].forEach(k => { if (this.state.addons[k]) addonIds.push({ Solar:'solar', EV:'night', Battery:'battery' }[k]); });
+    if (name === 'Gas') {
+      // Gas-only: go + edr stay; the electricity-only cards swoop OUT. Inner content swaps instantly.
+      const leaving = ['wd', ...addonIds];
+      this.setState(s => { const ex = { ...(s.exiting || {}) }; leaving.forEach(idd => ex[idd] = true); return { fuel: name, exiting: ex, gasInstant: true }; });
+      if (this._fuelExitTimer) clearTimeout(this._fuelExitTimer);
+      this._fuelExitTimer = setTimeout(() => { this.setState(s => { const ex = { ...(s.exiting || {}) }; leaving.forEach(idd => delete ex[idd]); return { exiting: ex }; }); }, 340);
+      if (this._gasInstTimer) clearTimeout(this._gasInstTimer);
+      this._gasInstTimer = setTimeout(() => this.setState({ gasInstant: false }), 60);
+    } else if (from === 'Gas') {
+      // Returning from gas-only: the electricity cards swoop IN; inner content swaps instantly.
+      const incoming = ['wd', ...addonIds];
+      this.setState(s => { const en = { ...(s.entering || {}) }; incoming.forEach(idd => en[idd] = true); return { fuel: name, entering: en, gasInstant: true }; });
+      if (this._enterClrTimer) clearTimeout(this._enterClrTimer);
+      this._enterClrTimer = setTimeout(() => { this.setState(s => { const en = { ...(s.entering || {}) }; incoming.forEach(idd => delete en[idd]); return { entering: en }; }); }, 600);
+      if (this._gasInstTimer) clearTimeout(this._gasInstTimer);
+      this._gasInstTimer = setTimeout(() => this.setState({ gasInstant: false }), 60);
+    } else {
+      // Electricity <-> Both: keep the gas section reveal/collapse animation.
+      this.setState({ fuel: name });
+    }
+  }
+  // Carousel position tracking — powers the dots / rail / arrow disabled-state.
+  onCarScroll(){ if (this._carRaf) return; this._carRaf = requestAnimationFrame(() => { this._carRaf = 0; this.readCar(); }); }
+  syncCar(){ this.readCar(); }
+  readCar(){
+    if (this._railDragging) return;
+    const el = this._scrollEl || document.querySelector('.cp-scroll');
+    if (!el) return;
+    const cards = [...el.querySelectorAll('[data-plan-id]')];
+    const cRect = el.getBoundingClientRect();
+    const padL = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0;
+    const cur = el.scrollLeft;
+    let idx = 0, best = Infinity;
+    cards.forEach((c, i) => { const t = cur + (c.getBoundingClientRect().left - cRect.left) - padL; const d = Math.abs(t - cur); if (d < best) { best = d; idx = i; } });
+    const next = { left: cur, max: el.scrollWidth - el.clientWidth, idx, n: cards.length, cw: el.clientWidth, sw: el.scrollWidth };
+    const c = this.state.car || {};
+    if (c.left===next.left && c.max===next.max && c.idx===next.idx && c.n===next.n && c.sw===next.sw && c.cw===next.cw) return;
+    this.setState({ car: next });
+  }
+  goToCard(i){
+    const el = this._scrollEl || document.querySelector('.cp-scroll');
+    if (!el) return;
+    const cards = [...el.querySelectorAll('[data-plan-id]')];
+    if (!cards[i]) return;
+    const cRect = el.getBoundingClientRect();
+    const padL = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0;
+    const target = el.scrollLeft + (cards[i].getBoundingClientRect().left - cRect.left) - padL;
+    this.smoothScrollX(el, target, 420);
+  }
+  // Manual rAF scroll tween — native smooth scrollTo is unreliable here, and this lets us
+  // suppress proximity snap for the whole glide so it doesn't yank back to the start.
+  smoothScrollX(el, target, dur){
+    if (this._scrollRaf) cancelAnimationFrame(this._scrollRaf);
+    const max = el.scrollWidth - el.clientWidth;
+    target = Math.max(0, Math.min(target, max));
+    const start = el.scrollLeft, dist = target - start, t0 = performance.now();
+    el.style.scrollSnapType = 'none';
+    const ease = p => 1 - Math.pow(1 - p, 3);
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      el.scrollLeft = start + dist * ease(p);
+      if (p < 1) { this._scrollRaf = requestAnimationFrame(step); }
+      else { this._scrollRaf = 0; el.style.scrollSnapType = ''; }
+    };
+    this._scrollRaf = requestAnimationFrame(step);
+  }
+  toggleAddon(name){
+    const id = { Solar:'solar', EV:'night', Battery:'battery' }[name];
+    const isOn = !!this.state.addons[name];
+    // Cancel any in-flight timers/rafs for this card so rapid on/off toggles reverse cleanly
+    // instead of queueing (the iOS-style interruptible feel).
+    this._exitTimers = this._exitTimers || {}; this._enterTimers = this._enterTimers || {}; this._exitRafs = this._exitRafs || {};
+    if (this._exitTimers[id]) { clearTimeout(this._exitTimers[id]); delete this._exitTimers[id]; }
+    if (this._enterTimers[id]) { clearTimeout(this._enterTimers[id]); delete this._enterTimers[id]; }
+    if (this._exitRafs[id]) { cancelAnimationFrame(this._exitRafs[id]); delete this._exitRafs[id]; }
+
+    if (!isOn) {
+      // TURN ON — checkbox flips on instantly; card swoops in. If it was mid-exit, cancel that.
+      this.setState(s => {
+        const ex = { ...(s.exiting || {}) }; delete ex[id];
+        return { addons: { ...s.addons, [name]: true }, entering: { ...(s.entering || {}), [id]: true }, exiting: ex };
+      });
+      // Glide the viewport to the new card's resting slot so it arrives in view as it lands.
+      const activeOrder = ['Battery','EV','Solar'].filter(k => k === name || this.state.addons[k]);
+      const index = Math.max(0, activeOrder.indexOf(name));
+      const restScroll = index * (this._slotPx || 308);
+      const el0 = document.querySelector('.cp-scroll');
+      const curScroll = el0 ? el0.scrollLeft : 0;
+      if (Math.abs(restScroll - curScroll) > 4) {
+        if (this._enterRaf) cancelAnimationFrame(this._enterRaf);
+        if (this._snapTimer) clearTimeout(this._snapTimer);
+        if (el0) el0.style.scrollSnapType = 'none';
+        const start = curScroll, t0 = performance.now(), DUR = 760;
+        const ease = p => 1 - Math.pow(1 - p, 3);
+        const tick = () => {
+          const el = document.querySelector('.cp-scroll');
+          if (el) {
+            const p = Math.min(1, (performance.now() - t0) / DUR);
+            const max = el.scrollWidth - el.clientWidth;
+            el.scrollLeft = Math.max(0, Math.min(start + (restScroll - start) * ease(p), max));
+            if (p < 1) { this._enterRaf = requestAnimationFrame(tick); return; }
+          }
+          this._enterRaf = 0;
+        };
+        this._enterRaf = requestAnimationFrame(tick);
+        this._snapTimer = setTimeout(() => {
+          const el = document.querySelector('.cp-scroll');
+          if (el) {
+            const max = el.scrollWidth - el.clientWidth;
+            if (Math.abs(el.scrollLeft - restScroll) > 2) el.scrollLeft = Math.max(0, Math.min(restScroll, max));
+            el.style.scrollSnapType = '';
+          }
+        }, DUR + 80);
+      }
+      this._enterTimers[id] = setTimeout(() => { delete this._enterTimers[id]; this.setState(st => { const e = { ...st.entering }; delete e[id]; return { entering: e }; }); }, 600);
+      return;
+    }
+
+    // TURN OFF — checkbox unchecks instantly; the card stays mounted (via the exiting set) and
+    // plays the swoop-out, so its neighbours slide over to fill the gap.
+    this.setState(s => {
+      const en = { ...(s.entering || {}) }; delete en[id];
+      return { addons: { ...s.addons, [name]: false }, exiting: { ...(s.exiting || {}), [id]: true }, entering: en };
+    });
+    const el = document.querySelector('.cp-scroll');
+    const cardEl = el && el.querySelector('[data-plan-id="' + id + '"]');
+    let compensate = false;
+    if (el && cardEl) {
+      const cr = el.getBoundingClientRect(), br = cardEl.getBoundingClientRect();
+      compensate = br.left < cr.left - 1;
+    }
+    if (el) el.style.scrollSnapType = 'none';
+    if (compensate && el && cardEl) {
+      const startScroll = el.scrollLeft;
+      const tick = () => {
+        const ml = parseFloat(getComputedStyle(cardEl).marginLeft) || 0;
+        el.scrollLeft = Math.max(0, startScroll + ml);
+        this._exitRafs[id] = requestAnimationFrame(tick);
+      };
+      this._exitRafs[id] = requestAnimationFrame(tick);
+    }
+    this._exitTimers[id] = setTimeout(() => {
+      if (this._exitRafs[id]) { cancelAnimationFrame(this._exitRafs[id]); delete this._exitRafs[id]; }
+      delete this._exitTimers[id];
+      this.setState(s => { const ex = { ...(s.exiting || {}) }; delete ex[id]; return { exiting: ex }; });
+      if (el) requestAnimationFrame(() => { el.style.scrollSnapType = ''; });
+    }, 340);
+  }
+  toggleRates(){ this.setState(s => ({ ratesOpen: !s.ratesOpen })); }
+  toggleGasRates(){ this.setState(s => ({ gasRatesOpen: !s.gasRatesOpen })); }
+
+  renderVals(){
+    const orange = '#FF6024', purple = '#8D39F5', green = '#028A00', grey = '#505050';
+    const est = 'Estimated cost inc GST for a small business using 4000 kWh / yearly on a Single rate tariff in the United Energy network.';
+    const gasEst = 'Estimated cost inc GST for a small business using 3500MJ / yearly on a Single rate tariff in the United Energy network.';
+    const fuel = this.state.fuel;
+    const showElec = fuel === 'Electricity' || fuel === 'Both';
+    const showGas = fuel === 'Gas' || fuel === 'Both';
+    const showAddons = showElec;
+
+    // --- Responsive breakpoints ---
+    const vw = this.state.vw || 1280;
+    const isMobile = vw < 768, isTablet = vw >= 768 && vw < 1200, isDesktop = vw >= 1200, isWide = vw >= 768;
+    // --- Card + track sizing: on desktop the page track is exactly 4 card-widths wide ---
+    const _cpvTablet = this.props.cardsTablet ?? 2.5;
+    const _cpvDesktop = this.props.cardsDesktop ?? 3.5;
+    const cardsPerView = isDesktop ? _cpvDesktop : _cpvTablet;
+    const cgap = isWide ? 16 : 8;
+    const _trackBase = isDesktop ? 1280 : Math.min(1280, (this.state.vw || 1280) - 80);
+    const cardW = Math.round((_trackBase - Math.floor(cardsPerView) * cgap) / cardsPerView);
+    const TRACK = isDesktop ? (4 * cardW + 3 * cgap) : 1280;
+    const trackMax = isWide ? (TRACK + 'px') : '1080px';
+    const navMax = isDesktop ? '1280px' : trackMax;
+    this._trackPx = isWide ? TRACK : (this.state.vw || 1280);
+    this._slotPx = (isWide ? (cardW + cgap) : 308);
+    const heroStyle = this.props.heroStyle ?? 'campaign';
+    const heroVariant = ['campaign','centered','imageLeft','minimal'].includes(heroStyle) ? heroStyle : 'campaign';
+    const heroStack = isWide && (this.state.vw || 1280) < 1320;
+    const cream = 'background:#FFF0D6;';
+    const innerBase = 'width:100%;max-width:' + trackMax + ';margin:0 auto;box-sizing:border-box;';
+    let heroBandStyle, heroInnerStyle, heroTextStyle, heroImageStyle;
+    if (heroVariant === 'centered') {
+      heroBandStyle = 'border-radius:32px;'+cream+'width:100%;box-sizing:border-box;padding:clamp(40px,3.5vw,64px) clamp(24px,3vw,48px)';
+      heroInnerStyle = innerBase + 'display:flex;flex-direction:column;align-items:center;text-align:center;gap:32px';
+      heroTextStyle = 'display:flex;flex-direction:column;align-items:center;text-align:center;gap:32px;max-width:680px;width:100%';
+      heroImageStyle = 'display:none';
+    } else if (heroVariant === 'imageLeft') {
+      heroBandStyle = 'border-radius:32px;'+cream+'width:100%;box-sizing:border-box;padding:clamp(40px,4.5vw,80px) clamp(24px,3vw,48px)';
+      heroInnerStyle = innerBase + 'display:flex;flex-wrap:wrap;align-items:center;gap:32px 48px';
+      heroTextStyle = 'flex:1 1 440px;min-width:min(440px,100%);display:flex;flex-direction:column;gap:32px;max-width:520px';
+      heroImageStyle = 'order:-1;flex:1 1 320px;min-width:min(280px,100%);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0';
+    } else if (heroVariant === 'minimal') {
+      heroBandStyle = 'border-radius:24px;'+cream+'width:100%;box-sizing:border-box;padding:clamp(28px,2.6vw,44px) clamp(24px,2.6vw,44px)';
+      heroInnerStyle = innerBase + 'display:flex;flex-direction:column;gap:24px';
+      heroTextStyle = 'display:flex;flex-direction:column;gap:24px;max-width:760px';
+      heroImageStyle = 'display:none';
+    } else {
+      heroBandStyle = 'border-radius:32px;'+cream+'width:100%;box-sizing:border-box;padding:clamp(40px,4.5vw,80px) clamp(24px,3vw,48px)';
+      heroInnerStyle = innerBase + 'display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px 48px';
+      heroTextStyle = 'flex:1 1 560px;min-width:min(440px,100%);display:flex;flex-direction:column;gap:32px;max-width:760px';
+      heroImageStyle = 'flex:0 0 auto;min-width:min(280px,100%);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0';
+      if (heroStack) {
+        heroInnerStyle = innerBase + 'display:flex;flex-direction:column;align-items:flex-start;gap:24px';
+        heroTextStyle = 'width:100%;display:flex;flex-direction:column;gap:24px;max-width:640px';
+        heroImageStyle = 'order:-1;width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:0';
+      }
+    }
+    const heroImgMax = heroStack ? '240px' : '420px';
+    const proofTopDisplay = heroStack ? 'flex' : 'none';
+    const proofImgDisplay = heroStack ? 'none' : 'flex';
+    // Responsive hero type scale: tablet tightened, desktop set to an intermediate size between the old H1 and the section H2.
+    const heroH1Size = isTablet ? '32px' : isDesktop ? '42px' : 'clamp(34px,3.6vw,54px)';
+    const heroH1Lh   = isTablet ? '1.14' : '1.08';
+    const heroLeadSize = isTablet ? '15px' : '16px';
+    const heroLeadLh   = isTablet ? '24px' : '26px';
+    const heroNoteSize = isTablet ? '12px' : '13px';
+    const heroSubSize  = isTablet ? '20px' : '24px';
+    const heroSubLh    = isTablet ? '28px' : '32px';
+    const heroH1Style   = 'margin:0;font-weight:700;font-size:'+heroH1Size+';line-height:'+heroH1Lh+';color:#232323;letter-spacing:-.015em;text-wrap:balance';
+    const heroLeadStyle = 'font-weight:400;font-size:'+heroLeadSize+';line-height:'+heroLeadLh+';color:#232323;max-width:560px';
+    const heroNoteStyle = 'font-weight:400;font-size:'+heroNoteSize+';line-height:21px;color:#737373;max-width:560px';
+    const heroSubStyle  = 'font-weight:500;font-size:'+heroSubSize+';line-height:'+heroSubLh+';color:#232323';
+    const filterLayout = ['bar','card','pills','split'].includes(this.props.filterLayout) ? this.props.filterLayout : 'bar';
+    const fIsCard = filterLayout === 'card' || filterLayout === 'split';
+    const fIsPill = filterLayout === 'pills' || filterLayout === 'split';
+    const showAddonFilters = this.props.showAddonFilters ?? true;
+    const visibleCount = isWide ? Math.max(1, Math.floor(cardsPerView)) : 1;
+    const pageBg = isWide ? '#ffffff' : '#dfe1e3';
+    const shellMax = isMobile ? '100%' : 'none';
+    const contentMax = trackMax;
+    const sidePad = isWide ? '40px' : '16px';
+    const innerPad = '0';
+    const heroPad = isDesktop ? '44px 64px 48px' : '52px 56px 56px';
+    const resultsPad = isMobile ? '32px 16px 120px' : '28px 40px 140px';
+    const resultsMt = isWide ? '0' : '24px';
+    const resultsGap = isWide ? '28px' : '24px';
+    const resultsRadius = isWide ? '40px 40px 0 0' : '24px 24px 0 0';
+    let filterWrap, segWidth, filterLabelDisplay, segBtnFlex, segTrackBg, segTrackBorder;
+    if (!isWide) {
+      filterWrap = 'border-radius:24px;background:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:16px;align-items:center';
+      segWidth = '100%';
+      segBtnFlex = 'flex:1';
+      segTrackBg = '#EFEFEF';
+      segTrackBorder = '#E2E2E2';
+      filterLabelDisplay = 'block';
+    } else {
+      segWidth = 'auto';
+      segBtnFlex = 'flex:0 0 auto;padding:0 24px';
+      segTrackBg = '#fff';
+      segTrackBorder = '#EAEAEA';
+      filterLabelDisplay = filterLayout === 'split' ? 'none' : 'block';
+      const rowBase = 'display:flex;flex-direction:row;align-items:center;gap:28px;flex-wrap:wrap;';
+      filterWrap = fIsCard
+        ? rowBase + 'background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);padding:18px 28px;'
+        : rowBase + 'padding:8px 0 4px;';
+    }
+    const resultsBarStyle = ((this.state.vw || 1280) < 1400)
+      ? 'flex:1 1 100%;display:flex;align-items:center;justify-content:space-between;gap:16px'
+      : 'flex:1 1 320px;min-width:280px;display:flex;align-items:center;justify-content:space-between;gap:16px';
+
+    const MODALS = {
+      variable: { icon:'Calendar', title:'Variable rates with ongoing benefit period', body:[
+        { isHead:true, text:'Variable rates' },
+        { isPara:true, text:"A variable rate means what you pay for energy could go up or down. Origin may change prices from time to time \u2013 we'll always let you know. We consider all kinds of factors when setting and changing our prices, like changes in our costs and the energy market overall." },
+        { isHead:true, text:'Ongoing benefit period' },
+        { isPara:true, text:'The benefits of this plan will not expire after any period, and you do not need to renew this plan to continue to receive these benefits.' } ] },
+      goVar: { icon:'Promo', title:'Everyday low variable electricity rates', body:[
+        { isPara:true, text:'Enjoy discounted energy rates year round, on a flat rate tariff.' },
+        { isPara:true, text:'Simple and easy to get going, no need to worry about prices changing during the day.' },
+        ...((this.props.creditOffer ?? true) ? [
+          { isHead:true, text:'Up to $200 in bill credits' },
+          { isPara:true, text:'Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas when you sign up online and stay until 30 June 2026.' },
+          { isList:true, items:[ 'New or moving residential customers only.', 'Available in NSW, SA and VIC.', "Not available if you've had a credit for the same fuel and address in the last 12 months." ] },
+          { isPara:true, text:'The credit is applied if your plan is still active on 30 June 2026. If eligible, the price estimate shown is reduced by this amount.' }
+        ] : []) ] },
+      credit: { icon:'Promo', title:'Get $100 in bill credits for each fuel', body:[
+        { isPara:true, text:'Get up to $200 (inc. GST) in bill credits \u2014 $100 each for electricity and natural gas when you sign up online and stay until 30 June 2026.' },
+        { isHead:true, text:'Eligibility' },
+        { isList:true, items:[ 'New or moving residential customers only.', 'Available in NSW, SA and VIC.', "Not available if you've had a credit for the same fuel and address in the last 12 months." ] },
+        { isHead:true, text:'How it works' },
+        { isPara:true, text:'The credit is applied if your plan is still active on 30 June 2026. If eligible, the price estimate shown above is reduced by this amount.' } ] },
+      edr: { icon:'BoxedReward', title:'Earn up to 10,000 Everyday Rewards Points', body:[
+        { isPara:true, text:'Get points for signing up:' },
+        { isList:true, items:[ 'New customers get 5,000 points for electricity and 5,000 points for gas.', 'Renewing customers get 2,500 points for electricity and 2,500 points for gas.' ] },
+        { isPara:true, text:'Plus, collect 1 point for every $1 you spend on your usage and supply (incl GST).' },
+        { isPara:true, text:"You'll need your Everyday Rewards number to sign up." } ] },
+      weekday: { icon:'TOU', title:'Half price electricity, weekdays 9am-5pm', body:[
+        { isPara:true, text:'Currently, the variable off-peak rate from 9am-5pm Monday to Friday is half-price compared to peak rates on this plan*' },
+        { isList:true, items:[ 'Ideal for those who use the most electricity on weekdays', 'Great for running appliances from 9am to 5pm weekdays', 'Suits those who can shift electricity use to weekdays' ] },
+        { isPara:true, text:"You'll need a smart meter to sign up for Origin Shift" } ] },
+      greenpower: { icon:'GreenPower', title:'100% GreenPower electricity', body:[
+        { isPara:true, text:'Origin will source electricity from GreenPower accredited renewable sources to match 100% of your electricity usage. This means that for 100% of electricity you consume, the equivalent amount of renewable energy gets sent to the grid.' } ] },
+      ev: { icon:'EVPowerup', title:'8c/kWh EV charging for compatible vehicles', body:[
+        { isPara:true, text:'$5 EV full charge estimate is based on a continuous electricity charge rate of 8c/kWh powering a Tesla Model Y or Tesla Model 3 with a useable 57.5 kWh battery. The estimated cost is $4.60 to charge a Tesla Model Y and Tesla Model 3 (RWD) from zero charge to full capacity with Origin EV Power Up.' },
+        { isPara:true, text:'Origin EV Power Up beta is our automated electric vehicle charging solution that unlocks a lean, EV-exclusive rate of 8c/kWh for scheduled charge sessions in the Origin app.' },
+        { isPara:true, text:"All you have to do is complete the sign-up journey in the app and link your compatible EV. Then it's as simple as plug in, set a time you need your EV charging to be completed by in the app and we'll handle the rest." } ] },
+      solar: { icon:'Solar', title:'Get a boosted FIT for your solar generation', body:[
+        { isPara:true, text:'Let your solar deliver more value with our Solar Boost plan!' },
+        { isPara:true, text:"Get ready to export more energy to the grid and reduce your energy bills. After all, that's what solar is all about. The great feed-in tariff rates on our Solar Boost plan will help you get the most from your solar system." } ] },
+      night: { icon:'EVCharge', title:'Fully charge your EV from $5 with 8c/kWh overnight', body:[
+        { isPara:true, text:'Currently, the variable off-peak electricity rate from 12am-6am every night is 8c/kWh*' },
+        { isList:true, items:[ 'Make the most of off peak electricity rates at night to charge your EV', 'Great for scheduling EV charging or appliances to run overnight', 'Ideal for those who use the most electricity from 12am-6am' ] },
+        { isPara:true, text:"You'll need a smart meter to sign up for Origin Shift" } ] },
+      battery: { icon:'Bolt', title:'4 hours of 0c/kWh rates a day plus a higher evening FIT', body:[
+        { isPara:true, text:'Time to let your battery start working for you' },
+        { isPara:true, text:'The plan built for homes with batteries - 4 free hours of electricity a day and super peak exports rates.' },
+        { isList:true, items:[ 'Charge your battery with 4 hours free electricity 11am-2pm and 2-3am* every day', 'Earn 33c kWh for exports between 6-9pm every day*', 'Stay in full control without complicated setups' ] } ] }
+    };
+
+    const calendar = { icon:'Calendar', text:'Variable rates with ongoing benefit period', modal:'variable' };
+    const greenPower = { icon:'GreenPower', text:'100% GreenPower electricity', modal:'greenpower' };
+    const evCharge = { icon:'EVPowerup', text:'8c/kWh EV charging for compatible vehicles', modal:'ev' };
+
+    let plans = [
+      { id:'go', name:'Origin Go Variable', tagline:'For homes who want everyday low prices.',
+        picto:'assets/pictogram-offer.svg', pictoH:'92px', tag:'Most popular', tagColor:'#D44500',
+        discount:'8', ref:'$2,411', yearly:'$2,218', gasYearly:'$1,386', est,
+        includedTitle:"What\u2019s included with Origin Go Variable.",
+        included:[ { icon:'Promo', text:'Everyday low variable electricity rates', modal:'goVar' }, calendar ],
+        addable:[ greenPower, evCharge ] },
+      { id:'edr', isLogo:true, name:'Origin Everyday Rewards Variable', tagline:'Save on your next shop by earning Everyday Rewards points.',
+        discount:'4', ref:'$2,411', yearly:'$2,314', gasYearly:'$1,494', est,
+        includedTitle:"What\u2019s included with Origin Everyday Rewards Variable.",
+        included:[ { icon:'BoxedReward', text:'Earn up to 10,000 Everyday Rewards Points', modal:'edr' }, calendar ],
+        addable:[ greenPower, evCharge ] },
+      { id:'wd', name:'Origin Weekday Shift', tagline:'Off-peak electricity rates on weekdays, 9am-5pm.',
+        picto:'assets/pictogram-bolt.svg', pictoH:'86px',
+        discount:'17', ref:'$2,411', yearly:'$1,995', est,
+        includedTitle:"What\u2019s included with Origin Weekday Shift.",
+        included:[ { icon:'TOU', text:'Half price electricity weekdays 9am-5pm', modal:'weekday' }, calendar ],
+        addable:[ greenPower ] }
+    ];
+
+    const addonPlans = {
+      Solar: { id:'solar', name:'Origin Solar Boost', tagline:'Get more from your solar panels with a boosted FIT (up to 8c/kWh)',
+        placeholderIcon:'SolarLine', tint:'#FFF0D6', tintFg:'#FF6024',
+        discount:'0', ref:'$2,411', yearly:'$2,411', est,
+        includedTitle:"What\u2019s included with Origin Solar Boost.",
+        included:[ { icon:'Solar', text:'Get a boosted FIT for your solar generation', modal:'solar' }, calendar ],
+        addable:[ greenPower, evCharge ] },
+      EV: { id:'night', name:'Origin Night Shift', tagline:'Off-peak electricity rates for charging your EV overnight.',
+        placeholderIcon:'ElectricCarLine', tint:'#F3E8FF', tintFg:'#8D39F5', tag:'Bring any EV', tagColor:'#FF6024',
+        discount:'1', ref:'$2,411', yearly:'$2,377', est,
+        includedTitle:"What\u2019s included with Origin Night Shift.",
+        included:[ { icon:'EVCharge', text:'Fully charge your EV from $5 with 8c/kWh overnight', modal:'night' }, calendar ],
+        addable:[ greenPower ] },
+      Battery: { id:'battery', name:'Origin Battery IQ', tagline:'Power your home with 4 free hours of power a day.',
+        placeholderIcon:'ChargeLine', tint:'#F3E8FF', tintFg:'#8D39F5', tag:'Just launched', tagColor:'#FF6024',
+        discount:'10', ref:'$2,411', yearly:'$1,497', est,
+        includedTitle:"What\u2019s included with Origin Battery IQ.",
+        included:[ { icon:'Bolt', text:'4 hours of 0c/kWh rates a day plus a higher evening FIT', modal:'battery' }, calendar ],
+        addable:[ greenPower ] }
+    };
+    // Prepend checked add-on plans so they lead the list; unshift order Solar→EV→Battery yields front order Battery, EV, Solar.
+    ['Solar','EV','Battery'].forEach(k => { const xid = { Solar:'solar', EV:'night', Battery:'battery' }[k]; if (this.state.addons[k] || (this.state.exiting && this.state.exiting[xid])) plans.unshift(addonPlans[k]); });
+    // Gas-only: just Origin Go Variable as a gas plan; add-ons (electricity) don't apply.
+    if (fuel === 'Gas') plans = plans.filter(p => p.id === 'go' || p.id === 'edr' || (this.state.exiting && this.state.exiting[p.id]));
+
+    plans.forEach(p => {
+      p.isLogo = !!p.isLogo;
+      p.showOffer = p.id === 'go';
+      p.showBolt = p.id === 'wd';
+      p.showSolar = p.id === 'solar';
+      p.showBattery = p.id === 'battery';
+      p.showNight = p.id === 'night';
+      p.tag = p.tag || '';
+      p.tagColor = p.tagColor || '#FF6024';
+      p.placeholderIcon = (p.showSolar || p.showBattery || p.showNight) ? '' : (p.placeholderIcon || '');
+      p.tint = p.tint || '#F1F1F1';
+      p.tintFg = p.tintFg || '#FF6024';
+      p.cardBorder = '1px solid transparent';
+      p.showCreditLink = false;
+      p.onCredit = () => this.openModal('credit');
+      if ((this.props.creditOffer ?? true) && p.id === 'go') {
+        p.tag = 'Bill credit offer';
+        p.tagColor = '#8D39F5';
+        p.showCreditLink = true;
+        if (p.included && p.included[0]) p.included[0] = { ...p.included[0], text: 'Everyday lower prices + up to $200 in bill credits (conditions apply)' };
+      }
+      p.gasYearly = p.gasYearly || '$2,218';
+      p.cardWidth = isWide ? (cardW + 'px') : ((fuel === 'Gas') ? '100%' : '300px');
+      p.slotPx = this._slotPx + 'px';
+      p.onToggleRates = () => this.toggleRates();
+      p.onToggleGasRates = () => this.toggleGasRates();
+      p.anim = (this.state.exiting && this.state.exiting[p.id]) ? 'cpCardOut .34s cubic-bezier(.16,.84,.44,1) both'
+             : (this.state.entering && this.state.entering[p.id]) ? 'cpCardIn .58s cubic-bezier(.34,1.28,.5,1) both'
+             : 'none';
+      // Entering card sits above its neighbours so they slide out from behind it to the right.
+      p.cardZ = (this.state.entering && this.state.entering[p.id]) ? 3 : 1;
+    });
+    plans.forEach(p => {
+      const fl = this.props.featureLayout ?? 'list';
+      const dtl = fl !== 'list';
+      const ind = this.props.detailIndicator ?? 'chevron';
+      const dstyle = (fl === 'list') ? 'divided' : fl;
+      const setup = (arr) => (arr||[]).forEach((perk, i) => {
+        perk.cursor = perk.modal ? 'pointer' : 'default';
+        perk.deco = perk.modal ? 'underline dotted' : 'none';
+        perk.onOpen = perk.modal ? () => this.openModal(perk.modal) : undefined;
+        const sep = i > 0 ? 'border-top:1px solid #ECECEC;' : '';
+        perk.sepStyle = sep;
+        perk.detailed = dtl;
+        perk.inline = !dtl;
+        perk.modalIndicator = dtl && !!perk.modal;
+        perk.indIcon = ind === 'info' ? 'Info' : 'ChevronLeftSmallSolid';
+        perk.indRotate = ind === 'info' ? 'none' : 'rotate(180deg)';
+        perk.indLabel = (dtl && dstyle === 'label' && perk.modal) ? 'Details' : '';
+        if (!dtl) { const fdiv = ((this.props.featureDivider ?? false) && i > 0) ? 'border-top:1px solid #ECECEC;padding-top:20px;' : ''; perk.rowStyle = 'display:flex;gap:12px;align-items:center;min-height:72px;' + fdiv + 'cursor:' + perk.cursor + ';'; perk.rowHover = ''; }
+        else {
+          const colBase = 'display:flex;flex-direction:column;gap:14px;cursor:' + perk.cursor + ';';
+          if (dstyle === 'boxed') { perk.rowStyle = colBase + 'background:#F7F7F7;border-radius:16px;padding:20px;'; perk.rowHover = 'background:#F0F0F0'; }
+          else if (dstyle === 'chips') { perk.rowStyle = colBase + 'border:1px solid #E3E3E3;border-radius:16px;padding:20px;'; perk.rowHover = 'border-color:#232323'; }
+          else if (dstyle === 'leftbar') { perk.rowStyle = colBase + 'padding:14px 0 14px 16px;border-left:3px solid #FF6024;'; perk.rowHover = 'background:#FFF6F2'; }
+          else if (dstyle === 'tinted') { perk.rowStyle = colBase + 'background:#FFF0D6;border-radius:16px;padding:20px;'; perk.rowHover = 'background:#FCE7BE'; }
+          else if (dstyle === 'hover') { perk.rowStyle = colBase + sep + 'padding:18px 12px;border-radius:12px;'; perk.rowHover = 'background:#F7F7F7'; }
+          else { perk.rowStyle = colBase + sep + 'padding-top:24px;padding-bottom:8px;'; perk.rowHover = ''; }
+        }
+      });
+      setup(p.included); setup(p.addable);
+      p.secBorder = (dtl && (dstyle === 'divided' || dstyle === 'label' || dstyle === 'hover')) ? 'border-top:1px solid #ECECEC;padding-top:8px;' : '';
+      p.secGap = (function(){ var rs = (this.props.rowSpacing ?? 'comfortable'); return rs === 'cozy' ? '12px' : rs === 'spacious' ? '40px' : '24px'; }).call(this);
+    });
+    const planCount = plans.length;
+    const planNoun = planCount === 1 ? 'plan' : 'plans';
+    const activeAddons = ['Solar','EV','Battery'].filter(k => this.state.addons[k]).map(k => ({ Solar:'solar', EV:'EV', Battery:'battery' }[k]));
+    let showLead, showBold;
+    if (fuel === 'Gas' || activeAddons.length === 0) {
+      showLead = 'Showing ' + planCount + ' popular ' + planNoun + ' for your home';
+      showBold = '';
+    } else {
+      const joined = activeAddons.length === 1 ? activeAddons[0]
+        : activeAddons.length === 2 ? activeAddons[0] + ' & ' + activeAddons[1]
+        : activeAddons.slice(0, -1).join(', ') + ' & ' + activeAddons[activeAddons.length - 1];
+      showLead = 'Showing ' + planCount + ' ' + planNoun + ' for your ';
+      showBold = joined;
+    }
+    const modal = this.state.activeModal ? MODALS[this.state.activeModal] : null;
+    const modalOpen = !!modal;
+    const closeModal = () => this.closeModal();
+    const stop = (e) => e.stopPropagation();
+    const closing = this.state.modalClosing;
+    const overlayAnim = closing ? 'cpFadeOut .3s cubic-bezier(.64,0,.78,.39) forwards' : 'cpFade .2s ease';
+    const sheetAnim = isWide
+      ? (closing ? 'cpModalOut .22s cubic-bezier(.4,0,1,1) forwards' : 'cpModalIn .34s cubic-bezier(.22,.61,.36,1)')
+      : (closing ? 'cpSlideDown .3s cubic-bezier(.64,0,.78,.39) forwards' : 'cpSlideUp .3s cubic-bezier(.22,.61,.36,1)');
+    const modalOverlayStyle = 'position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.75);display:flex;flex-direction:column;align-items:center;justify-content:' + (isWide ? 'center' : 'flex-end') + ';padding:' + (isWide ? '24px' : '0') + ';box-sizing:border-box;animation:' + overlayAnim;
+    const modalSheetStyle = (isWide
+      ? 'width:100%;max-width:640px;max-height:86vh;overflow-y:auto;background:#fff;border-radius:24px;padding:44px 48px;display:flex;flex-direction:column;gap:24px;box-sizing:border-box'
+      : 'width:100%;max-width:402px;max-height:90vh;overflow-y:auto;background:#fff;border-radius:24px 24px 0 0;padding:28px 24px 40px;display:flex;flex-direction:column;gap:24px;box-sizing:border-box') + ';animation:' + sheetAnim;
+    const ratesOpen = this.state.ratesOpen;
+    const ratesClosed = !ratesOpen;
+    const ratesRows = ratesOpen ? '1fr' : '0fr';
+    const gasRatesOpen = this.state.gasRatesOpen;
+    const gasRatesClosed = !gasRatesOpen;
+    const gasRatesRows = gasRatesOpen ? '1fr' : '0fr';
+
+    const fuelNames = ['Electricity','Gas','Both'];
+    const fuelIndex = Math.max(0, fuelNames.indexOf(fuel));
+    const thumbTransform = 'translateX(' + (fuelIndex * 100) + '%)';
+
+    const fuelOptions = fuelNames.map(name => ({
+      name,
+      bg: this.state.fuel === name ? '#232323' : 'transparent',
+      fg: this.state.fuel === name ? '#fff' : '#505050',
+      onSelect: () => this.selectFuel(name)
+    }));
+
+    const addonsDisabled = fuel === 'Gas';
+    const addonList = ['Solar','EV','Battery'].map(name => {
+      const checked = !!this.state.addons[name];
+      const dim = addonsDisabled;
+      const border = dim ? '#CDCDCD' : (checked ? '#FF6024' : '#737373');
+      const bg = dim ? (checked ? '#CDCDCD' : '#F4F4F4') : (checked ? '#FF6024' : '#fff');
+      const cursor = dim ? 'not-allowed' : 'pointer';
+      let wrapStyle, squareDisplay, textColor;
+      if (fIsPill && isWide) {
+        squareDisplay = 'none';
+        const pBorder = dim ? '#CDCDCD' : (checked ? '#FF6024' : '#D5D5D5');
+        const pBg = dim ? '#F4F4F4' : (checked ? '#FF6024' : '#fff');
+        textColor = dim ? '#AFAFAF' : (checked ? '#fff' : '#232323');
+        wrapStyle = 'display:flex;align-items:center;gap:8px;cursor:'+cursor+';border:1.5px solid '+pBorder+';background:'+pBg+';border-radius:22px;padding:9px 18px;transition:all .2s ease';
+      } else {
+        squareDisplay = 'flex';
+        textColor = dim ? '#AFAFAF' : '#232323';
+        wrapStyle = 'display:flex;align-items:center;gap:8px;cursor:'+cursor+';transition:color .25s ease';
+      }
+      return { name, checked, border, bg, textColor, cursor, wrapStyle, squareDisplay,
+        onToggle: dim ? (() => {}) : (() => this.toggleAddon(name)) };
+    });
+
+    plans.forEach(p => { Object.assign(p, { showElec, showGas, showAddons, gasEst, ratesOpen, ratesClosed, ratesRows, gasRatesOpen, gasRatesClosed, gasRatesRows, ratesVbar: ratesOpen ? '0' : '1', gasRatesVbar: gasRatesOpen ? '0' : '1', gasGrid: showGas ? '1fr' : '0fr', gasMt: showGas ? (showElec ? '-48px' : '0') : '-56px', gasAccGrid: showGas ? '1fr' : '0fr', gasOpacity: showGas ? '1' : '0', gasTrans: this.state.gasInstant ? 'none' : 'grid-template-rows .44s cubic-bezier(.4,0,.2,1),margin-top .44s cubic-bezier(.4,0,.2,1),opacity .3s ease', gasAccTrans: this.state.gasInstant ? 'none' : 'grid-template-rows .44s cubic-bezier(.4,0,.2,1),opacity .3s ease' }); });
+
+    // Fake address search state
+    const sp = this.state.searchPhase;
+    const showPlaceholder = sp === 'idle';
+    const showTyped = sp === 'typing' || sp === 'open';
+    const showSuccessText = sp === 'success';
+    const showClear = sp === 'typing' || sp === 'open';
+    const showCheck = sp === 'success';
+    const showDropdown = sp === 'open';
+    const searchButtonLabel = sp === 'success' ? 'View my plans' : 'Search';
+    const startSearch = () => this.startSearch();
+    const clearSearch = (e) => this.clearSearch(e);
+    const searchAction = () => this.searchAction();
+    const onCarouselKey = (e) => this.onCarouselKey(e);
+    const onSearchFocus = () => this.onSearchFocus();
+    const onSearchInput = (e) => this.onSearchInput(e);
+    if (!this._searchInput) this._searchInput = React.createRef();
+    const searchInputRef = this._searchInput;
+    const suggestions = [
+      '6 Nerli Street, Abbotsbury NSW 2176',
+      '6 Nerli Place, Abbotsbury NSW 2176',
+      '16 Nerli Street, Abbotsbury NSW 2176',
+      '26 Nerli Street, Prestons NSW 2170'
+    ].map(addr => ({ label: addr, onSelect: () => this.pickAddress(addr) }));
+    const searchValue = this.state.searchValue;
+
+    // --- Carousel layout (bp-driven) ---
+    const carGap = cgap + 'px';
+    const carMargin = isWide ? '0' : '0';
+    const carPad = isWide ? ('4px max(40px, calc((100vw - ' + TRACK + 'px) / 2)) 14px max(40px, calc((100vw - ' + TRACK + 'px) / 2))') : '0 16px 8px';
+    const carScrollPad = isWide ? ('max(40px, calc((100vw - ' + TRACK + 'px) / 2))') : '16px';
+    const _m = Math.max(40, ((this.state.vw || 1280) - TRACK) / 2);
+    const carMask = isWide ? ('linear-gradient(to right, transparent 0, #000 ' + _m + 'px, #000 calc(100% - ' + _m + 'px), transparent 100%)') : 'none';
+    const overflow = isWide && planCount > visibleCount;
+    const car = this.state.car || { left:0, max:0, idx:0, n:planCount, cw:0, sw:0 };
+    const atStart = car.left <= 2;
+    const atEnd = car.max <= 2 || car.left >= car.max - 2;
+    const prevDisabled = !overflow || atStart;
+    const nextDisabled = !overflow || atEnd;
+    const _arrowBase = 'width:40px;height:40px;border-radius:50%;border:1px solid #D8D8D8;background:#fff;color:#232323;display:flex;align-items:center;justify-content:center;transition:opacity .2s,box-shadow .2s;';
+    const prevArrowStyle = _arrowBase + 'opacity:' + (prevDisabled ? '.35' : '1') + ';cursor:' + (prevDisabled ? 'default' : 'pointer');
+    const nextArrowStyle = _arrowBase + 'opacity:' + (nextDisabled ? '.35' : '1') + ';cursor:' + (nextDisabled ? 'default' : 'pointer');
+    const showRail = overflow;
+    const _visPct = car.sw > 0 ? Math.max(14, Math.min(100, (car.cw / car.sw) * 100)) : 100;
+    const _frac = car.max > 0 ? Math.min(1, Math.max(0, car.left / car.max)) : 0;
+    const railThumbStyle = 'position:absolute;top:0;height:6px;border-radius:3px;background:#232323;transition:left .12s linear,width .2s;width:' + _visPct + '%;left:' + (_frac * (100 - _visPct)) + '%';
+    const onCarScroll = () => this.onCarScroll();
+    const onRailDown = (e) => this.onRailDown(e);
+    const onCarMove = (e) => this.onCarMove(e);
+    const scrollLeft = () => this.scrollCarousel(-1);
+    const scrollRight = () => this.scrollCarousel(1);
+    const onDragStart = (e) => this.onDragStart(e);
+    const carCursor = isWide ? 'grab' : 'auto';
+    const onCarouselHover = (e) => this.onCarouselHover(e);
+    const onCarouselLeave = () => this.onCarouselLeave();
+
+    return { plans, fuelOptions, addonList, planCount, planNoun, showLead, showBold, modal, modalOpen, closeModal, stop, modalTop: this.state.modalTop || 0, overlayAnim, sheetAnim, modalOverlayStyle, modalSheetStyle, ratesOpen, ratesClosed, ratesRows, gasRatesOpen, gasRatesClosed, gasRatesRows, gasEst, showElec, showGas, showAddons, thumbTransform, showPlaceholder, showTyped, showSuccessText, showClear, showCheck, showDropdown, searchButtonLabel, startSearch, clearSearch, searchAction, onCarouselKey, onSearchFocus, onSearchInput, searchInputRef, suggestions, searchValue,
+      isMobile, isTablet, isDesktop, isWide, heroStyle, heroBandStyle, heroInnerStyle, heroTextStyle, heroImageStyle, filterLayout, pageBg, shellMax, contentMax, sidePad, innerPad, resultsPad, resultsMt, resultsGap, resultsRadius,
+      navMax, carGap, carMargin, carPad, carScrollPad, carMask, scrollLeft, scrollRight, onDragStart, carCursor, onCarScroll, onRailDown, onCarMove, showRail, prevArrowStyle, nextArrowStyle, railThumbStyle, scrollRef: (el) => { this._scrollEl = el; },
+      filterWrap, segWidth, segBtnFlex, filterLabelDisplay, segTrackBg, segTrackBorder, segRef: (el) => { this._segEl = el; }, thumbRef: (el) => { this._thumbEl = el; }, showAddonFilters, heroH1Style, heroLeadStyle, heroNoteStyle, heroSubStyle, heroImgMax, proofTopDisplay, proofImgDisplay, resultsBarStyle };
+  }
+}
+</script>
+</body>
+</html>
