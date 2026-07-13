@@ -158,6 +158,10 @@ const MODALS={
     {p:'Time to let your battery start working for you'},
     {p:'The plan built for homes with batteries - 4 free hours of electricity a day and super peak exports rates.'},
     {l:['Charge your battery with 4 hours free electricity 11am-2pm and 2-3am* every day','Earn 33c kWh for exports between 6-9pm every day*','Stay in full control without complicated setups']}]},
+  credit:{icon:'Promo',title:'Up to $200 in moving credits',body:[
+    {p:'Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas when you sign up online and stay until 30 June 2026.'},
+    {h:'Eligibility'},{l:['New or moving residential customers only.','Available in NSW, SA and VIC.',"Not available if you've had a credit for the same fuel and address in the last 12 months."]},
+    {h:'How it works'},{p:'The credit is applied if your plan is still active on 30 June 2026.'}]},
   embedded:{icon:'Info',title:'Embedded electricity networks',body:[
     {p:'Some apartment buildings buy electricity in bulk and on-sell it to residents — this is called an embedded network.'},
     {p:"At these addresses only selected Origin plans are available, and solar, battery and EV plans generally can't be connected."},
@@ -323,20 +327,31 @@ function heroHTML(lo){
     ['"Moving day power and internet sorted in one go."','Dan, Wollongong'],
     ['"They handled everything with my old provider. Painless."','Priya, Liverpool']
   ];
-  return`<div style="max-width:640px;margin:0 auto;padding:${lo.isMobile?'36px 16px 64px':'56px 24px 80px'};animation:cpFade .3s ease">
-  <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
-    <div class="t15" style="font-weight:500">Electricity, natural gas &amp; internet</div>
-    <h1 class="t28" style="margin:0;font-weight:700">Compare plans for your home</h1>
-    <div class="t15 mid">See real prices for your address in under a minute.</div>
-  </div>
-  <div style="margin:26px 0 0">
-    <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #232323;border-radius:30px;padding:13px 18px;background:#fff">
+  const addrField=`<div style="position:relative">
+    <div style="display:flex;align-items:center;gap:10px;border-radius:30px;padding:13px 18px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.08)">
       <cp-icon name="SearchSolid" size="22"></cp-icon>
       <input id="addr-input" class="cp-input" placeholder="Enter your address to get started…" autocomplete="off" value="${S.addrValue.replace(/"/g,'&quot;')}" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:16px;color:#232323;padding:0">
     </div>
-    <div id="addr-list" style="display:flex;flex-direction:column;max-height:300px;overflow-y:auto">${suggestListHTML(S.addrValue)}</div>
-    <div class="t13 mut" style="text-align:center;padding-top:10px">No spam, no obligation — your address just tells us the right prices and what's available.</div>
-  </div>
+    <div id="addr-list" style="display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:#fff;border-radius:16px;margin-top:8px;box-shadow:0 8px 28px rgba(0,0,0,.12);overflow:hidden">${suggestListHTML(S.addrValue)}</div>
+  </div>`;
+  const offerCopy=`
+    <div class="t15" style="font-weight:500">Electricity, natural gas &amp; internet</div>
+    <h1 style="margin:6px 0 0;font-weight:700;font-size:${lo.isMobile?'28px':'36px'};line-height:${lo.isMobile?'34px':'42px'};color:#232323;text-wrap:balance">Switch or move with Origin Go Variable</h1>
+    <div class="t15" style="padding-top:12px;color:#232323">Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas. Sign up online and stay until 30 June 2026.</div>
+    <div class="t13" style="padding-top:8px;color:#8A7A58">New or moving residents in NSW, SA or VIC only. Not available if you've had a credit for the same fuel and address in the last 12 months. · <span data-modal="credit" class="cp-link">offer details</span></div>`;
+  const card=lo.isMobile
+    ?`<div style="background:#FFF0D6;border-radius:28px;padding:26px 22px;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;justify-content:center;padding-bottom:8px"><img src="project/assets/comfy-credits.png" alt="Comfy Credits" style="width:160px;height:auto"></div>
+      ${offerCopy}
+      <div style="padding-top:16px">${addrField}</div>
+    </div>`
+    :`<div style="background:#FFF0D6;border-radius:28px;padding:44px 48px;display:flex;align-items:center;gap:44px">
+      <div style="flex:1 1 auto;min-width:0">${offerCopy}<div style="padding-top:20px;max-width:480px">${addrField}</div></div>
+      <img src="project/assets/comfy-credits.png" alt="Comfy Credits" style="width:280px;height:auto;flex-shrink:0">
+    </div>`;
+  return`<div style="max-width:${lo.isMobile?640:960}px;margin:0 auto;padding:${lo.isMobile?'20px 16px 64px':'32px 24px 80px'};animation:cpFade .3s ease">
+  ${card}
+  <div class="t13 mut" style="text-align:center;padding-top:12px">No spam, no obligation — your address just tells us the right prices and what's available.</div>
   <div style="display:flex;flex-direction:${lo.isMobile?'column':'row'};gap:${lo.isMobile?'12px':'28px'};justify-content:center;padding:30px 0 0">
     ${trust('<cp-icon name="Bolt" size="22"></cp-icon>','2-minute quote')}
     ${trust('<cp-icon name="VerifiedUserSolid" size="22"></cp-icon>','No lock-in, no exit fees')}
@@ -410,8 +425,18 @@ function servicesHTML(lo){
     </button>`;
   };
   const anyOn=Object.keys(sv).some(k=>sv[k]&&(k!=='gas'||!ces));
+  const unlockAmt=100+(ces?0:100);
+  const unlock=S.quote.moving==='Moving'
+    ?`<div style="background:#F0F7F2;border-radius:16px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;margin-bottom:20px;animation:cpFade .4s ease">
+      <span style="width:26px;height:26px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center;animation:cpPop .45s cubic-bezier(.34,1.56,.64,1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>
+      <div style="min-width:0">
+        <div class="t15" style="font-weight:700;color:#0E7B3D">Great — you've unlocked up to $${unlockAmt} in moving credits.</div>
+        <div class="t13 mid" style="padding-top:2px">$100 for electricity${ces?'':' and $100 for natural gas'}, applied if your plan is active on 30 Jun 2026 · <span data-modal="credit" class="cp-link">details</span></div>
+      </div>
+    </div>`:'';
   const inner=`
   ${soFarHTML()}
+  ${unlock}
   <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Here's what Origin can offer at ${shortAddr()}</h1>
   <p class="t15 mid" style="margin:0 0 22px;text-align:center">Everything below is available at your address — pick what you'd like in your quote.</p>
   <div style="display:flex;flex-direction:column;gap:10px">
@@ -554,14 +579,38 @@ ${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo,false)).join(''),pla
 <div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip electricity</button></div>`;
 }
 function gaspHTML(lo){
-  const plans=[BASE_PLANS[0],BASE_PLANS[1]];
-  return`${stepperHTML('gasp')}
-<div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">
-  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your gas plan</h1>
-  <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
-</div>
-${carouselHTML(lo,'car-gas',plans.map(p=>richCardHTML(p,lo,true)).join(''),plans.length)}
-<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip natural gas</button></div>`;
+  // One option, no choice: gas rides along on the same plan family.
+  const plan=planById(S.quote.elecPlan)||BASE_PLANS[0];
+  const e=est(plan,true);
+  const proof=t=>`<div style="display:flex;gap:10px;align-items:flex-start">${tick}<span class="t15 mid">${t}</span></div>`;
+  const inner=`
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Add natural gas?</h1>
+  <p class="t15 mid" style="margin:0 0 20px;text-align:center">${S.quote.elecPlan?`Same plan family as your electricity — nothing extra to work out.`:`One simple single-rate plan for ${shortAddr()}.`}</p>
+  <div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><cp-icon name="Gas" size="38"></cp-icon></div>
+      <div><div class="t13 mut">${plan.name}</div><div class="t17" style="font-weight:700">Natural gas — single rate</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      ${proof('Same account, one bill')}
+      ${proof('Connected together — nothing extra to do')}
+      ${proof('No lock-in, cancel anytime')}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span class="t28" style="font-weight:700">${$f(e.cost)}<span class="t13" style="font-weight:600">/year</span></span>
+        <span data-act="est-modal" style="width:18px;height:18px;color:#909090;display:inline-flex;cursor:pointer"><cp-icon name="Info" size="18"></cp-icon></span>
+      </div>
+      <div class="t13 mut">${estNote(true)}</div>
+    </div>
+    <div style="background:#F7F7F7;border-radius:14px;padding:13px 15px;display:flex;flex-direction:column;gap:5px">
+      <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Daily supply</span><span style="font-weight:600">${GAS_RATES.supply}</span></div>
+      <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Usage</span><span style="font-weight:600">${GAS_RATES.usage}</span></div>
+    </div>
+    <button data-act="gas-add" class="cta t15" style="width:100%">Add natural gas</button>
+    <button data-act="skip-product" class="t15 mid" style="border:0;background:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px">No thanks, skip gas</button>
+  </div>`;
+  return focusShell(lo,inner,'gasp');
 }
 function lpgHTML(lo){
   const opt=q=>{
@@ -622,6 +671,14 @@ function quoteHTML(lo){
   }
   if(q.lpg) rows.push(quoteRowHTML(`<cp-icon name="Gas" size="34"></cp-icon>`,'LPG bottles',`${q.lpg.qty} × ${LPG.name}`,`$${q.lpg.qty*LPG.bottle} per swap`,'lpg'));
   if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);rows.push(quoteRowHTML(`<cp-icon name="Bolt" size="34"></cp-icon>`,'nbn® Internet',t.name,`$${t.price}/month`,'net'));}
+  const credits=q.moving==='Moving'?100*((q.elecPlan?1:0)+(q.gasPlan?1:0)):0;
+  const creditRow=credits?`<div style="background:#F0F7F2;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:12px">
+    ${tick}
+    <div style="flex:1 1 auto;min-width:0">
+      <div class="t15" style="font-weight:700;color:#0E7B3D">Moving credits reserved — $${credits}</div>
+      <div class="t13 mid">Applied if your plan is active on 30 Jun 2026 · <span data-modal="credit" class="cp-link">details</span></div>
+    </div>
+  </div>`:'';
   const situation=q.existing==='Yes'?(q.moving==='Moving'?'existing customer, moving':'existing customer, plan change'):(q.moving==='Moving'?'new customer, moving in':'new customer, switching');
   const inner=`
   <div style="text-align:center;padding-bottom:18px">
@@ -630,7 +687,8 @@ function quoteHTML(lo){
   </div>
   ${rows.length?`<div style="display:flex;flex-direction:column;gap:12px">${rows.join('')}</div>`
     :`<div class="t15 mid" style="text-align:center;padding:20px 0">No products selected yet. <button data-act="edit-step" data-v="services" class="qlink t15">Choose services</button></div>`}
-  ${hasEnergy?`<div class="t13 mut" style="padding-top:14px">${estNote(false)} Gas estimates use ~${HH[S.answers.household].mj} MJ a year.</div>`:''}
+  ${creditRow}
+  ${hasEnergy?`<div class="t13 mut" style="padding-top:14px">${estNote(false)} Gas estimates use ~${HH[S.answers.household].mj} MJ a year. Price estimates exclude credits.</div>`:''}
   ${rows.length?`
   <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:22px auto 0">
     <button data-act="go-signup" class="cta t15" style="width:100%">Sign up</button>
@@ -648,6 +706,8 @@ function signupFormHTML(lo){
   if(q.gasPlan) bits.push('Natural gas');
   if(q.lpg) bits.push(`LPG × ${q.lpg.qty}`);
   if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);bits.push(`nbn® ${t.name}`);}
+  const sfCredits=q.moving==='Moving'?100*((q.elecPlan?1:0)+(q.gasPlan?1:0)):0;
+  if(sfCredits) bits.push(`$${sfCredits} moving credits`);
   const lead=q.elecPlan?planById(q.elecPlan):q.gasPlan?planById(q.gasPlan):BASE_PLANS[0];
   const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px">
     <span class="t13" style="font-weight:600;color:#505050">${label}</span>
@@ -826,8 +886,10 @@ document.addEventListener('click',e=>{
       break;}
     case'pick-plan':
       if(S.step==='elec') S.quote.elecPlan=v;
-      else if(S.step==='gasp') S.quote.gasPlan=v;
       goStep(nextAfter(S.step));break;
+    case'gas-add':
+      S.quote.gasPlan=S.quote.elecPlan||'go';
+      goStep(nextAfter('gasp'));break;
     case'pick-net':S.quote.net=v;goStep(nextAfter('net'));break;
     case'skip-product':{
       if(S.step==='elec')S.quote.elecPlan=null;
