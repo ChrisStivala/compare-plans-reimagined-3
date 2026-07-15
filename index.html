@@ -424,28 +424,45 @@ function servicesHTML(lo){
     ces?'':row(lpgIcon,'LPG bottle delivery'),
     row('<cp-icon name="Bolt" size="30"></cp-icon>','High-speed nbn® plans')
   ].filter(Boolean).join('');
+  const assure=S.quote.moving==='Moving'
+    ?{icon:'Calendar',b:'Next-day move guarantee',rest:' — connected for move-in day.'}
+    :{icon:'Promo',b:'Award-winning bundled energy &amp; internet',rest:' — Canstar, 4 years in a row.'};
   const inner=`
-  <h1 id="svc-heading" class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Checking what we can offer at ${shortAddr()}…</h1>
-  <p class="t15 mid" style="margin:0 0 18px;text-align:center">You'll pick plans one at a time — everything is optional.</p>
-  <div style="display:flex;flex-direction:column;max-width:380px;margin:0 auto">${rows}</div>`;
+  <div id="svc-wrap">
+    <h1 id="svc-heading" class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Checking what we can offer at ${shortAddr()}…</h1>
+    <p class="t15 mid" style="margin:0 0 18px;text-align:center">You'll pick plans one at a time — everything is optional.</p>
+    <div style="display:flex;flex-direction:column;max-width:380px;margin:0 auto">${rows}</div>
+    <div data-reveal style="display:flex;align-items:center;justify-content:center;gap:10px;padding:26px 8px 0;opacity:0">
+      <cp-icon name="${assure.icon}" size="28" style="flex-shrink:0"></cp-icon>
+      <span class="t15 mid" style="text-align:left"><span style="font-weight:700;color:#232323">${assure.b}</span>${assure.rest}</span>
+    </div>
+    <div data-reveal class="t17" style="text-align:center;font-weight:700;padding-top:18px;opacity:0">Let's get you connected.</div>
+  </div>`;
   return focusShell(lo,inner,null);
 }
 let _revealTimers=[];
 function runReveal(){
   _revealTimers.forEach(clearTimeout);_revealTimers=[];
   const els=[...document.querySelectorAll('[data-reveal]')];
+  const rowsN=els.length-2; // last two are the reassurance + closing lines
   els.forEach((el,i)=>{
     _revealTimers.push(setTimeout(()=>{el.style.opacity='1';el.style.animation='rise .45s cubic-bezier(.22,.61,.36,1) both';},450+i*450));
   });
   _revealTimers.push(setTimeout(()=>{
     const h=document.getElementById('svc-heading');
     if(h) h.textContent=`Here's what we can offer at ${shortAddr()}`;
-  },450+els.length*450+200));
-  // Loading-screen semantics: advance on our own, replacing this history
-  // entry so Back from the first product step skips the interstitial.
+  },450+rowsN*450+200));
+  // Loading-screen semantics: hold a beat on 'Let's get you connected.',
+  // fade the page out, then advance — replacing this history entry so
+  // Back from the first product step skips the interstitial.
+  const lastAt=450+(els.length-1)*450;
+  _revealTimers.push(setTimeout(()=>{
+    const wrap=document.getElementById('svc-wrap');
+    if(S.step==='services'&&wrap) wrap.style.animation='cpFadeOut .35s ease forwards';
+  },lastAt+1400));
   _revealTimers.push(setTimeout(()=>{
     if(S.step==='services') goStep(queueSteps()[0],'replace');
-  },450+els.length*450+1300));
+  },lastAt+1780));
 }
 
 /* ── Rich plan cards + carousel (regular compare-plans style) ─ */
