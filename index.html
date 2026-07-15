@@ -387,7 +387,7 @@ function qOpt(act,v,label,sub,on){
 function qExistingHTML(lo){
   const inner=`
   ${backLink()}
-  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you already with Origin?</h1>
+  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you new to Origin?</h1>
   <div style="display:flex;flex-direction:column;gap:10px">
     ${qOpt('q-existing','No',"I'm new to Origin","Welcome — let's find you a great plan",S.quote.existing==='No')}
     ${qOpt('q-existing','Yes',"I'm already a customer","Nice to see you again — we'll find your best offers",S.quote.existing==='Yes')}
@@ -580,6 +580,7 @@ function elecHTML(lo){
   const plans=elecPlansList();
   const chk=(k,label)=>`<label data-act="filter" data-v="${k}" class="chk${S.filters[k]?' on':''}"><span class="box">${S.filters[k]?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>':''}</span>${label}</label>`;
   const inner=`
+  ${backLink()}
   <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Let's find your electricity plan</h1>
   <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
   ${S.quote.moving==='Moving'?`<div class="t13 grn" style="text-align:center;padding-bottom:4px">Moving in? We can have you connected by tomorrow.</div>`:''}
@@ -638,6 +639,7 @@ function gaspHTML(lo){
   if(ces){
     // No mains gas at embedded-network addresses: the step is LPG-only.
     const inner=`
+    ${backLink()}
     <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">No mains gas here — how about LPG?</h1>
     <p class="t15 mid" style="margin:0 0 20px;text-align:center">There's no mains gas at ${shortAddr()}, so we deliver 45kg exchange bottles instead.</p>
     ${lpgCardHTML()}
@@ -646,6 +648,7 @@ function gaspHTML(lo){
   }
   const tab=(v,label)=>`<button data-act="gas-tab" data-v="${v}" class="t15" style="border:0;background:none;cursor:pointer;padding:10px 4px;font-weight:${S.gasTab===v?'700':'500'};color:${S.gasTab===v?'#232323':'#909090'};border-bottom:2.5px solid ${S.gasTab===v?'#232323':'transparent'}">${label}</button>`;
   const inner=`
+  ${backLink()}
   <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Want to add natural gas?</h1>
   <p class="t15 mid" style="margin:0 0 12px;text-align:center">${S.quote.elecPlan?'It sits on the same account as your electricity — one bill.':'One simple option for '+shortAddr()+'.'}</p>
   <div style="display:flex;justify-content:center;gap:22px;border-bottom:1px solid #EFEFEF;margin-bottom:20px">
@@ -658,6 +661,7 @@ function gaspHTML(lo){
 function netHTML(lo){
   return`${stepperHTML('net')}
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">
+  ${backLink()}
   <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">One last thing — fast internet?</h1>
   <div class="t13 mut" style="text-align:center;padding-bottom:4px">nbn® at ${shortAddr()} — FTTP ready</div>
 </div>
