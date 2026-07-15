@@ -213,7 +213,7 @@ const S={
   answers:{household:'m'},
   addrValue:'',
   filters:{Solar:false,EV:false,Battery:false},
-  gasTab:'gas',unlockShown:false,revealed:false,
+  gasTab:'gas',unlockShown:false,
   netTier:'500',lpgQty:2,
   sheet:{view:null,planId:null},
   form:{name:'',email:'',mobile:'',conc:null,life:null},
@@ -408,35 +408,26 @@ function qSituationHTML(lo){
   return focusShell(lo,inner,null);
 }
 
-/* ── Services reveal: staged availability results that sell ─── */
+/* ── Services check: auto-advancing interstitial ────────────── */
 function servicesHTML(lo){
   const ces=S.quote.ces;
-  const elecPlansN=ces?2:3;
-  const elecFrom=$f(Math.min(...(ces?[BASE_PLANS[0],BASE_PLANS[1]]:BASE_PLANS).map(p=>est(p,false).cost)));
-  const gasFrom=$f(est(BASE_PLANS[0],true).cost);
-  const done=S.revealed;
-  const row=(i,icon,name,detail)=>`<div data-reveal="${i}" style="background:#fff;border:1.5px solid #E6E6E6;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;${done?'':'opacity:0'}">
+  const lpgIcon='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg>';
+  const row=(icon,name)=>`<div data-reveal style="display:flex;align-items:center;gap:14px;padding:12px 4px;opacity:0">
     <span style="width:34px;height:34px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center">${icon}</span>
-    <span style="display:flex;flex-direction:column;gap:1px;min-width:0;flex:1 1 auto">
-      <span class="t15" style="font-weight:700">${name}</span>
-      <span class="t13 mid">${detail}</span>
-    </span>
+    <span class="t17" style="font-weight:700;min-width:0;flex:1 1 auto">${name}</span>
     ${tick}
   </div>`;
   const rows=[
-    row(0,'<cp-icon name="Electricity" size="32"></cp-icon>','Smart electricity plans',
-      ces?`2 plans from ${elecFrom}/yr · embedded network <span data-modal="embedded" style="display:inline-flex;width:14px;height:14px;vertical-align:-2px"><cp-icon name="Info" size="14"></cp-icon></span>`
-         :`${elecPlansN} plans from ${elecFrom}/yr · smart meter ready`),
-    ces?row(1,'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg>','LPG bottle delivery',`No mains gas here — 45kg bottles from $${LPG.bottle} per swap`)
-       :row(1,'<cp-icon name="Gas" size="32"></cp-icon>','Natural gas',`Single rate from ${gasFrom}/yr · mains connection`),
-    ces?'':row(2,'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg>','LPG bottle delivery',`Bottled option from $${LPG.bottle} per swap`),
-    row(3,'<cp-icon name="Bolt" size="30"></cp-icon>','High-speed nbn® plans',`${NET_TIERS.length} plans from $${NET_TIERS[0].price}/mth · FTTP ready`)
+    row('<cp-icon name="Electricity" size="32"></cp-icon>','Smart electricity plans'),
+    ces?row(lpgIcon,'LPG bottle delivery')
+       :row('<cp-icon name="Gas" size="32"></cp-icon>','Natural gas'),
+    ces?'':row(lpgIcon,'LPG bottle delivery'),
+    row('<cp-icon name="Bolt" size="30"></cp-icon>','High-speed nbn® plans')
   ].filter(Boolean).join('');
   const inner=`
-  <h1 id="svc-heading" class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">${done?`Here's what we can offer at ${shortAddr()}`:`Checking what we can offer at ${shortAddr()}…`}</h1>
-  <p class="t15 mid" style="margin:0 0 22px;text-align:center">You'll pick plans one at a time — everything is optional.</p>
-  <div style="display:flex;flex-direction:column;gap:10px">${rows}</div>
-  <button id="svc-continue" data-act="svc-continue" class="cta t15" style="width:100%;margin-top:20px;${done?'':'opacity:0;pointer-events:none'}">Continue</button>`;
+  <h1 id="svc-heading" class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Checking what we can offer at ${shortAddr()}…</h1>
+  <p class="t15 mid" style="margin:0 0 18px;text-align:center">You'll pick plans one at a time — everything is optional.</p>
+  <div style="display:flex;flex-direction:column;max-width:380px;margin:0 auto">${rows}</div>`;
   return focusShell(lo,inner,null);
 }
 let _revealTimers=[];
@@ -444,15 +435,17 @@ function runReveal(){
   _revealTimers.forEach(clearTimeout);_revealTimers=[];
   const els=[...document.querySelectorAll('[data-reveal]')];
   els.forEach((el,i)=>{
-    _revealTimers.push(setTimeout(()=>{el.style.opacity='1';el.style.animation='rise .45s cubic-bezier(.22,.61,.36,1) both';},450+i*550));
+    _revealTimers.push(setTimeout(()=>{el.style.opacity='1';el.style.animation='rise .45s cubic-bezier(.22,.61,.36,1) both';},450+i*450));
   });
   _revealTimers.push(setTimeout(()=>{
     const h=document.getElementById('svc-heading');
     if(h) h.textContent=`Here's what we can offer at ${shortAddr()}`;
-    const c=document.getElementById('svc-continue');
-    if(c){c.style.opacity='1';c.style.pointerEvents='auto';c.style.animation='rise .45s cubic-bezier(.22,.61,.36,1) both';}
-    S.revealed=true;
-  },450+els.length*550+250));
+  },450+els.length*450+200));
+  // Loading-screen semantics: advance on our own, replacing this history
+  // entry so Back from the first product step skips the interstitial.
+  _revealTimers.push(setTimeout(()=>{
+    if(S.step==='services') goStep(queueSteps()[0],'replace');
+  },450+els.length*450+1300));
 }
 
 /* ── Rich plan cards + carousel (regular compare-plans style) ─ */
@@ -656,10 +649,13 @@ ${carouselHTML(lo,'car-net',NET_TIERS.map(t=>netCardHTML(t,lo)).join(''),NET_TIE
 }
 
 /* ── Your quote ─────────────────────────────────────────────── */
-const bigTick=`<span style="width:34px;height:34px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>`;
-function quoteRowHTML(name,benefit,editStep){
-  return`<div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px">
-  ${bigTick}
+// Staggered entrance: row slides in, then its check pops — all CSS delays.
+const QSTEP=350;
+const riseAt=ms=>`animation:rise .45s cubic-bezier(.22,.61,.36,1) ${ms}ms both`;
+const bigTick=ms=>`<span style="width:34px;height:34px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center;animation:cpPop .5s cubic-bezier(.34,1.56,.64,1) ${ms}ms both"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>`;
+function quoteRowHTML(i,name,benefit,editStep){
+  return`<div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px;${riseAt(i*QSTEP)}">
+  ${bigTick(i*QSTEP+250)}
   <div style="flex:1 1 auto;min-width:0">
     <div class="t15" style="font-weight:700">${name}</div>
     <div class="t13 mid">${benefit}</div>
@@ -670,33 +666,37 @@ function quoteRowHTML(name,benefit,editStep){
 function quoteHTML(lo){
   const q=S.quote;
   const rows=[];
+  const add=(name,benefit,editStep)=>rows.push(quoteRowHTML(rows.length,name,benefit,editStep));
   if(q.elecPlan){
     const p=planById(q.elecPlan);
-    rows.push(quoteRowHTML('Electricity — '+p.name,p.benefit,'elec'));
+    add('Electricity — '+p.name,p.benefit,'elec');
   }
-  if(q.gasPlan) rows.push(quoteRowHTML('Natural gas','Simple single rate, bundled on the same account','gasp'));
-  if(q.lpg) rows.push(quoteRowHTML('LPG bottles',`${q.lpg.qty} × ${LPG.name} — order swaps anytime in the app`,'gasp'));
-  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);rows.push(quoteRowHTML('nbn® Internet — '+t.name,t.evening+', unlimited data','net'));}
+  if(q.gasPlan) add('Natural gas','Simple single rate, bundled on the same account','gasp');
+  if(q.lpg) add('LPG bottles',`${q.lpg.qty} × ${LPG.name} — order swaps anytime in the app`,'gasp');
+  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);add('nbn® Internet — '+t.name,t.evening+', unlimited data','net');}
+  let slot=rows.length;
   const credits=q.moving==='Moving'?100*((q.elecPlan?1:0)+(q.gasPlan?1:0)):0;
-  const creditRow=credits?`<div style="background:#F0F7F2;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:12px">
+  const creditRow=credits?`<div style="background:#F0F7F2;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:12px;${riseAt(slot*QSTEP)}">
     ${tick}
     <div style="flex:1 1 auto;min-width:0">
       <div class="t15" style="font-weight:700;color:#0E7B3D">$${credits} moving credits reserved</div>
       <div class="t13 mid">Applied to your first bills if your plan is active on 30 Jun 2026 · <span data-modal="credit" class="cp-link">details</span></div>
     </div>
   </div>`:'';
+  if(credits) slot++;
   const assure=q.moving==='Moving'
     ?{icon:'Calendar',h:'Next-day move guarantee',p:"Tell us your move-in date and we'll have your services connected for day one — guaranteed."}
     :rows.length>=2
     ?{icon:'Promo',h:'An award-winning bundle',p:'One account, one bill and one app for everything at your place.'}
     :{icon:'Promo',h:'Award-winning app',p:'Track usage, pay bills and manage your plan any time in the Origin app.'};
-  const assureCard=rows.length?`<div style="background:#FFF6E9;border-radius:16px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;margin-top:12px">
+  const assureCard=rows.length?`<div style="background:#FFF6E9;border-radius:16px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;margin-top:12px;${riseAt(slot*QSTEP)}">
     <cp-icon name="${assure.icon}" size="34" style="flex-shrink:0"></cp-icon>
     <div style="flex:1 1 auto;min-width:0">
       <div class="t15" style="font-weight:700">${assure.h}</div>
       <div class="t13 mid">${assure.p}</div>
     </div>
   </div>`:'';
+  if(rows.length) slot++;
   const situation=q.existing==='Yes'?(q.moving==='Moving'?'existing customer, moving':'existing customer, plan change'):(q.moving==='Moving'?'new customer, moving in':'new customer, switching');
   const inner=`
   <div style="text-align:center;padding-bottom:18px">
@@ -704,15 +704,17 @@ function quoteHTML(lo){
     <div class="t13 mut">${quoteRef()} · ${q.address||'No address'} · ${situation}</div>
   </div>
   ${rows.length?`<div style="display:flex;flex-direction:column;gap:12px">${rows.join('')}</div>`
-    :`<div class="t15 mid" style="text-align:center;padding:20px 0">No products selected yet. <button data-act="edit-step" data-v="services" class="qlink t15">Choose services</button></div>`}
+    :`<div class="t15 mid" style="text-align:center;padding:20px 0">No products selected yet. <button data-act="edit-step" data-v="elec" class="qlink t15">Choose plans</button></div>`}
   ${creditRow}
   ${assureCard}
   ${rows.length?`
-  <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:22px auto 0">
-    <button data-act="go-signup" class="cta t15" style="width:100%">Sign up</button>
-    <button data-act="save-quote" class="t15" style="border:1.5px solid #C9C9C9;background:#fff;border-radius:26px;min-height:52px;font-weight:600;cursor:pointer">Save quote</button>
-  </div>
-  <div class="t13 mut" style="text-align:center;padding-top:14px">No lock-in · no exit fees · about 4 minutes to sign up</div>`:''}`;
+  <div style="${riseAt(slot*QSTEP+150)}">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:22px auto 0">
+      <button data-act="go-signup" class="cta t15" style="width:100%">Sign up</button>
+      <button data-act="save-quote" class="t15" style="border:1.5px solid #C9C9C9;background:#fff;border-radius:26px;min-height:52px;font-weight:600;cursor:pointer">Save quote</button>
+    </div>
+    <div class="t13 mut" style="text-align:center;padding-top:14px">No lock-in · no exit fees · about 4 minutes to sign up</div>
+  </div>`:''}`;
   return focusShell(lo,inner,'quote');
 }
 
@@ -871,7 +873,8 @@ function maybeUnlock(){
 /* ── Flow ───────────────────────────────────────────────────── */
 function goStep(step,push){
   S.step=step;
-  if(push!==false) history.pushState({step},'','');
+  if(push==='replace') history.replaceState({step},'','');
+  else if(push!==false) history.pushState({step},'','');
   window.scrollTo(0,0);
   render();
 }
@@ -890,7 +893,7 @@ function render(){
   else if(S.step==='quote') body=quoteHTML(lo);
   else if(S.step==='signup') body=signupFormHTML(lo);
   document.getElementById('root').innerHTML=topBarHTML(lo)+progressBarHTML()+body;
-  if(S.step==='services'&&!S.revealed) runReveal();
+  if(S.step==='services') runReveal();
   if(S.step==='hero'){
     const inp=document.getElementById('addr-input');
     if(inp){
@@ -911,7 +914,6 @@ document.addEventListener('click',e=>{
   if(sg){
     S.quote.address=sg.getAttribute('data-suggest');
     S.quote.ces=sg.getAttribute('data-ces')==='1';
-    S.revealed=false;
     goStep('q-existing');return;
   }
   const md=e.target.closest('[data-modal]');
@@ -923,7 +925,6 @@ document.addEventListener('click',e=>{
     case'step-back':history.back();break;
     case'q-existing':S.quote.existing=v;goStep('q-situation');break;
     case'q-moving':S.quote.moving=v;goStep('services');break;
-    case'svc-continue':goStep(queueSteps()[0]);break;
     case'gas-tab':S.gasTab=v;render();break;
     case'filter':S.filters[v]=!S.filters[v];render();break;
     case'car-prev':case'car-next':{
@@ -967,7 +968,7 @@ document.addEventListener('click',e=>{
     case'restart':
       S.step='hero';S.quoteRef=null;S.addrValue='';
       S.quote={address:'',ces:false,existing:null,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null};
-      S.gasTab='gas';S.unlockShown=false;S.revealed=false;
+      S.gasTab='gas';S.unlockShown=false;
       S.filters={Solar:false,EV:false,Battery:false};
       S.form={name:'',email:'',mobile:'',conc:null,life:null};
       window.scrollTo(0,0);render();break;
