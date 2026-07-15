@@ -208,15 +208,16 @@ const STEP_OF={elec:'elec',gas:'gasp',lpg:'lpg',net:'net'};
 const S={
   vw:window.innerWidth,
   step:'hero',
-  quote:{address:'',ces:false,existing:null,moving:null,
+  quote:{address:'',ces:false,moving:null,
     elecPlan:null,gasPlan:null,lpg:null,net:null},
   answers:{household:'m'},
   addrValue:'',
   filters:{Solar:false,EV:false,Battery:false},
   gasTab:'gas',unlockShown:false,
+  sf:{step:'details',known:false,channel:null},
   netTier:'500',lpgQty:2,
   sheet:{view:null,planId:null},
-  form:{name:'',email:'',mobile:'',conc:null,life:null},
+  form:{first:'',last:'',email:'',mobile:'',conc:null,life:null},
   quoteRef:null,
   activeModal:null,modalClosing:false
 };
@@ -295,11 +296,10 @@ function focusShell(lo,inner,cur,wide){
 function progressPct(){
   const q=queueSteps();
   if(S.step==='hero')return 8;
-  if(S.step==='q-existing')return 20;
-  if(S.step==='q-situation')return 30;
-  if(S.step==='services')return 42;
+  if(S.step==='q-situation')return 22;
+  if(S.step==='services')return 38;
   const i=q.indexOf(S.step);
-  if(i>=0)return 55+Math.round((i/Math.max(1,q.length))*25);
+  if(i>=0)return 52+Math.round((i/Math.max(1,q.length))*28);
   if(S.step==='quote')return 90;
   if(S.step==='signup')return 96;
   return 8;
@@ -384,26 +384,13 @@ function qOpt(act,v,label,sub,on){
     ${on?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg>':''}
   </button>`;
 }
-function qExistingHTML(lo){
-  const inner=`
-  ${backLink()}
-  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you new to Origin?</h1>
-  <div style="display:flex;flex-direction:column;gap:10px">
-    ${qOpt('q-existing','No',"I'm new to Origin","Welcome — let's find you a great plan",S.quote.existing==='No')}
-    ${qOpt('q-existing','Yes',"I'm already a customer","Nice to see you again — we'll find your best offers",S.quote.existing==='Yes')}
-  </div>`;
-  return focusShell(lo,inner,null);
-}
 function qSituationHTML(lo){
-  const ex=S.quote.existing==='Yes';
   const inner=`
   ${backLink()}
   <h1 class="t28" style="margin:6px 0 20px;font-weight:700">What brings you here today?</h1>
   <div style="display:flex;flex-direction:column;gap:10px">
     ${qOpt('q-moving','Moving',"I'm moving to a new home",'We can have you connected by tomorrow',S.quote.moving==='Moving')}
-    ${ex
-      ?qOpt('q-moving','Renew',"I'm not moving, but I want a better plan","We'll compare against what you're on now",S.quote.moving==='Renew')
-      :qOpt('q-moving','Switching',"I'm not moving, but I want a better plan",'We handle the switch — nothing to cancel',S.quote.moving==='Switching')}
+    ${qOpt('q-moving','Switching',"I'm not moving, but I want a better plan",'We handle the switch — nothing to cancel',S.quote.moving==='Switching')}
   </div>`;
   return focusShell(lo,inner,null);
 }
@@ -718,7 +705,7 @@ function quoteHTML(lo){
     </div>
   </div>`:'';
   if(rows.length) slot++;
-  const situation=q.existing==='Yes'?(q.moving==='Moving'?'existing customer, moving':'existing customer, plan change'):(q.moving==='Moving'?'new customer, moving in':'new customer, switching');
+  const situation=q.moving==='Moving'?'moving in':'switching';
   const inner=`
   <div style="text-align:center;padding-bottom:18px">
     <h1 class="t28" style="margin:0 0 6px;font-weight:700">All your home's essentials, sorted in one place</h1>
@@ -739,11 +726,15 @@ function quoteHTML(lo){
   return focusShell(lo,inner,'quote');
 }
 
-/* ── Sales form ─────────────────────────────────────────────── */
+/* ── Sales form: details → sign-in (account holders) → finish ─ */
+// Prototype stand-in for the account lookup: one seeded customer.
+const SEEDED={email:'sam.sample@origin.com.au',mobile:'0400000000'};
+const maskEmail=e=>{const[u,d]=(e||'').split('@');return(u?u[0]:'•')+'•••@'+(d||'');};
+const maskMobile=m=>'•••• ••• '+((m||'').replace(/\D/g,'').slice(-3)||'•••');
 function signupFormHTML(lo){
-  const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px">
+  const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-width:0">
     <span class="t13" style="font-weight:600;color:#505050">${label}</span>
-    <input data-field="${key}" type="${type}" placeholder="${ph}" value="${(S.form[key]||'').replace(/"/g,'&quot;')}" autocomplete="off" style="min-height:48px;border:1.5px solid #C9C9C9;border-radius:14px;padding:0 16px;font-family:gordita;font-size:16px;color:#232323;outline:none">
+    <input data-field="${key}" type="${type}" placeholder="${ph}" value="${(S.form[key]||'').replace(/"/g,'&quot;')}" autocomplete="off" style="min-height:48px;border:1.5px solid #C9C9C9;border-radius:14px;padding:0 16px;font-family:gordita;font-size:16px;color:#232323;outline:none;width:100%;box-sizing:border-box">
   </label>`;
   const yn=(label,key)=>`<div style="display:flex;flex-direction:column;gap:8px">
     <span class="t13" style="font-weight:600;color:#505050">${label}</span>
@@ -751,21 +742,68 @@ function signupFormHTML(lo){
       ${['Yes','No'].map(o=>`<button data-act="form-opt" data-v="${key}:${o}" class="q-opt t15${S.form[key]===o?' on':''}" style="min-height:48px;flex:1;justify-content:center">${o}</button>`).join('')}
     </div>
   </div>`;
-  const inner=`
-  <div class="t15 mid" style="text-align:center;padding-bottom:16px">If you have an Origin account, <a href="#" class="cp-link" style="color:#232323;font-weight:600">sign in for a smoother checkout</a>.</div>
-  <div class="t13 mut" style="padding:0 2px 18px">Let's set up your account — about 4 minutes, no credit card needed.</div>
-  <div style="display:flex;flex-direction:column;gap:16px">
-    ${field('Full name','name','text','Jane Citizen')}
-    ${field('Email','email','email','jane@example.com')}
-    ${field('Mobile','mobile','tel','04XX XXX XXX')}
-    ${yn('Do you have a concession card?','conc')}
-    ${yn('Does anyone at this address rely on life support equipment?','life')}
-    <button data-act="signup-end" class="cta t15" style="width:100%;margin-top:4px">Start my connection</button>
-  </div>
-  <div style="display:flex;gap:20px;padding-top:14px">
-    <a href="#" class="t13 mut">Energy fact sheet</a>
-    <a href="#" class="t13 mut">Terms &amp; conditions</a>
-  </div>`;
+  const back=`<button data-act="sf-back" class="t13 mid" style="border:0;background:none;cursor:pointer;padding:0 0 14px;font-weight:600">← Back</button>`;
+  const step=S.sf.step;
+  let inner='';
+  if(step==='details'){
+    inner=`
+    <div class="t15 mid" style="text-align:center;padding-bottom:16px">If you have an Origin account, <a href="#" class="cp-link" style="color:#232323;font-weight:600">sign in for a smoother checkout</a>.</div>
+    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Let's start with your details</h1>
+    <div class="t13 mut" style="padding:0 2px 18px">About 4 minutes — no credit card needed.</div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;gap:12px;flex-direction:${lo.isMobile?'column':'row'}">
+        ${field('First name','first','text','Jane')}
+        ${field('Last name','last','text','Citizen')}
+      </div>
+      ${field('Email','email','email','jane@example.com')}
+      ${field('Mobile','mobile','tel','04XX XXX XXX')}
+      <button data-act="sf-continue" class="cta t15" style="width:100%;margin-top:4px">Continue</button>
+    </div>`;
+  }else if(step==='password'){
+    inner=`
+    ${back}
+    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Welcome back</h1>
+    <div class="t15 mid" style="padding-bottom:18px">${(S.form.email||'').replace(/</g,'&lt;')}</div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      ${field('Password','pw','password','••••••••')}
+      <a href="#" class="t13 cp-link" style="color:#505050">Forgot your password?</a>
+      <button data-act="sf-login" class="cta t15" style="width:100%;margin-top:4px">Log in</button>
+    </div>`;
+  }else if(step==='otp'){
+    const chosen=S.sf.channel;
+    const chOpt=(v,label)=>`<button data-act="sf-channel" data-v="${v}" class="q-opt t15${chosen===v?' on':''}">${label}</button>`;
+    inner=`
+    ${back}
+    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Making sure you're you</h1>
+    <p class="t15 mid" style="margin:0 0 18px">How would you like to get a one-time code?</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${chOpt('sms','Text a code to '+maskMobile(S.form.mobile||SEEDED.mobile))}
+      ${chOpt('email','Email a code to '+maskEmail(S.form.email))}
+    </div>
+    ${chosen?`
+    <div class="t15 mid" style="text-align:center;padding:22px 0 4px">We sent a code to <strong>${chosen==='sms'?maskMobile(S.form.mobile||SEEDED.mobile):maskEmail(S.form.email)}</strong></div>
+    <div style="display:flex;gap:8px;justify-content:center;padding:12px 0 6px">
+      ${[0,1,2,3,4,5].map(i=>`<input data-otp="${i}" inputmode="numeric" autocomplete="one-time-code" maxlength="1" style="width:${lo.isMobile?'42px':'46px'};height:54px;text-align:center;font-size:22px;font-weight:700;font-family:gordita;color:#232323;border:1.5px solid #C9C9C9;border-radius:12px;outline:none;box-sizing:border-box">`).join('')}
+    </div>
+    <div class="t13 mid" style="text-align:center">Didn't get a code? <a href="#" class="cp-link">Send another one</a></div>`:''}`;
+  }else{
+    inner=`
+    ${back}
+    <h1 class="t28" style="margin:0 0 4px;font-weight:700">A couple of final checks</h1>
+    ${S.sf.known
+      ?`<div style="background:#F0F7F2;border-radius:14px;padding:13px 16px;display:flex;align-items:flex-start;gap:10px;margin:12px 0 6px">${tick}
+        <span class="t15" style="color:#0E7B3D"><strong>Welcome back${S.form.first?', '+S.form.first.replace(/</g,'&lt;'):''}</strong> — we've matched your Origin account and prefilled your details.</span></div>`
+      :`<div class="t13 mut" style="padding:2px 2px 6px">No password needed today — we'll help you set up online access once you're connected.</div>`}
+    <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+      ${yn('Do you have a concession card?','conc')}
+      ${yn('Does anyone at this address rely on life support equipment?','life')}
+      <button data-act="signup-end" class="cta t15" style="width:100%;margin-top:4px">Start my connection</button>
+    </div>
+    <div style="display:flex;gap:20px;padding-top:14px">
+      <a href="#" class="t13 mut">Energy fact sheet</a>
+      <a href="#" class="t13 mut">Terms &amp; conditions</a>
+    </div>`;
+  }
   return`<div style="max-width:520px;margin:0 auto;padding:${lo.isMobile?'24px 20px 60px':'40px 24px 80px'};animation:cpFade .3s ease">${inner}</div>`;
 }
 
@@ -889,7 +927,6 @@ function render(){
   const lo=L();
   let body='';
   if(S.step==='hero') body=heroHTML(lo);
-  else if(S.step==='q-existing') body=qExistingHTML(lo);
   else if(S.step==='q-situation') body=qSituationHTML(lo);
   else if(S.step==='services') body=servicesHTML(lo);
   else if(S.step==='elec') body=elecHTML(lo);
@@ -919,7 +956,7 @@ document.addEventListener('click',e=>{
   if(sg){
     S.quote.address=sg.getAttribute('data-suggest');
     S.quote.ces=sg.getAttribute('data-ces')==='1';
-    goStep('q-existing');return;
+    goStep('q-situation');return;
   }
   const md=e.target.closest('[data-modal]');
   if(md){openModal(md.getAttribute('data-modal'));return;}
@@ -928,7 +965,6 @@ document.addEventListener('click',e=>{
   const act=el.getAttribute('data-act'),v=el.getAttribute('data-v');
   switch(act){
     case'step-back':history.back();break;
-    case'q-existing':S.quote.existing=v;goStep('q-situation');break;
     case'q-moving':S.quote.moving=v;goStep('services');break;
     case'gas-tab':S.gasTab=v;render();break;
     case'filter':S.filters[v]=!S.filters[v];render();break;
@@ -968,19 +1004,49 @@ document.addEventListener('click',e=>{
       else done();
       break;}
     case'form-opt':{const[f,val]=v.split(':');S.form[f]=val;render();break;}
+    case'sf-continue':{
+      const em=(S.form.email||'').trim().toLowerCase();
+      const mb=(S.form.mobile||'').replace(/\D/g,'');
+      S.sf.known=em===SEEDED.email||(!!mb&&mb===SEEDED.mobile);
+      S.sf.step=S.sf.known?'password':'finish';
+      window.scrollTo(0,0);render();break;}
+    case'sf-login':S.sf.step='otp';S.sf.channel=null;window.scrollTo(0,0);render();break;
+    case'sf-channel':{
+      S.sf.channel=v;render();
+      const first=document.querySelector('[data-otp="0"]');
+      if(first) first.focus();
+      break;}
+    case'sf-back':{
+      const order=S.sf.known?['details','password','otp','finish']:['details','finish'];
+      const i=order.indexOf(S.sf.step);
+      if(i>0){S.sf.step=order[i-1];window.scrollTo(0,0);render();}
+      break;}
     case'signup-end':openModal('signupEnd');break;
     case'restart':
       S.step='hero';S.quoteRef=null;S.addrValue='';
-      S.quote={address:'',ces:false,existing:null,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null};
+      S.quote={address:'',ces:false,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null};
       S.gasTab='gas';S.unlockShown=false;
       S.filters={Solar:false,EV:false,Battery:false};
-      S.form={name:'',email:'',mobile:'',conc:null,life:null};
+      S.form={first:'',last:'',email:'',mobile:'',conc:null,life:null};
+      S.sf={step:'details',known:false,channel:null};
       window.scrollTo(0,0);render();break;
   }
 });
 document.addEventListener('input',e=>{
   const f=e.target.closest&&e.target.closest('[data-field]');
-  if(f) S.form[f.getAttribute('data-field')]=f.value;
+  if(f){S.form[f.getAttribute('data-field')]=f.value;return;}
+  const o=e.target.closest&&e.target.closest('[data-otp]');
+  if(o){
+    o.value=o.value.replace(/\D/g,'').slice(-1);
+    const boxes=[...document.querySelectorAll('[data-otp]')];
+    const i=+o.getAttribute('data-otp');
+    if(o.value&&i<boxes.length-1) boxes[i+1].focus();
+    if(boxes.every(b=>b.value)){
+      // Any 6 digits pass in the prototype; account holders land prefilled.
+      if(S.sf.known){S.form.conc=S.form.conc||'No';S.form.life=S.form.life||'No';}
+      setTimeout(()=>{S.sf.step='finish';window.scrollTo(0,0);render();},300);
+    }
+  }
 });
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&S.activeModal&&!S.modalClosing) closeModal();
