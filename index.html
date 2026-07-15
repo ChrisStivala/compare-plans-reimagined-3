@@ -737,15 +737,6 @@ function quoteHTML(lo){
 
 /* ── Sales form ─────────────────────────────────────────────── */
 function signupFormHTML(lo){
-  const q=S.quote;
-  const bits=[];
-  if(q.elecPlan) bits.push('Electricity');
-  if(q.gasPlan) bits.push('Natural gas');
-  if(q.lpg) bits.push(`LPG × ${q.lpg.qty}`);
-  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);bits.push(`nbn® ${t.name}`);}
-  const sfCredits=q.moving==='Moving'?100*((q.elecPlan?1:0)+(q.gasPlan?1:0)):0;
-  if(sfCredits) bits.push(`$${sfCredits} moving credits`);
-  const lead=q.elecPlan?planById(q.elecPlan):q.gasPlan?planById(q.gasPlan):BASE_PLANS[0];
   const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px">
     <span class="t13" style="font-weight:600;color:#505050">${label}</span>
     <input data-field="${key}" type="${type}" placeholder="${ph}" value="${(S.form[key]||'').replace(/"/g,'&quot;')}" autocomplete="off" style="min-height:48px;border:1.5px solid #C9C9C9;border-radius:14px;padding:0 16px;font-family:gordita;font-size:16px;color:#232323;outline:none">
@@ -757,15 +748,8 @@ function signupFormHTML(lo){
     </div>
   </div>`;
   const inner=`
-  <div style="background:#F7F7F7;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px">
-    <div style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center">${picto(lead,38)}</div>
-    <div style="flex:1 1 auto;min-width:0">
-      <div class="t15" style="font-weight:700">${quoteRef()}</div>
-      <div class="t13 mut">${bits.join(' · ')} · ${shortAddr()}</div>
-    </div>
-    <button data-act="edit-quote" class="t13" style="border:0;background:none;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;flex-shrink:0">change</button>
-  </div>
-  <div class="t13 mut" style="padding:14px 2px 18px">Set up your account · takes about 4 minutes · no credit card needed</div>
+  <div class="t15 mid" style="text-align:center;padding-bottom:16px">If you have an Origin account, <a href="#" class="cp-link" style="color:#232323;font-weight:600">sign in for a smoother checkout</a>.</div>
+  <div class="t13 mut" style="padding:0 2px 18px">Set up your account · takes about 4 minutes · no credit card needed</div>
   <div style="display:flex;flex-direction:column;gap:16px">
     ${field('Full name','name','text','Jane Citizen')}
     ${field('Email','email','email','jane@example.com')}
@@ -972,7 +956,6 @@ document.addEventListener('click',e=>{
     case'hh-set':S.answers.household=v;render();openModal('estimates');break;
     case'edit-step':goStep(v);break;
     case'go-signup':goStep('signup');break;
-    case'edit-quote':goStep('quote');break;
     case'save-quote':openModal('savequote');break;
     case'copy-quote':{
       const url=location.origin+location.pathname+'?q='+serializeQuote();
