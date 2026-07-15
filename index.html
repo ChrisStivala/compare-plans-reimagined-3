@@ -209,7 +209,7 @@ const S={
   vw:window.innerWidth,
   step:'hero',
   quote:{address:'',ces:false,moving:null,
-    elecPlan:null,gasPlan:null,lpg:null,net:null},
+    elecPlan:null,gasPlan:null,lpg:null,net:null,greenpower:false,modem:false},
   answers:{household:'m'},
   addrValue:'',
   filters:{Solar:false,EV:false,Battery:false},
@@ -677,11 +677,11 @@ function quoteHTML(lo){
   const add=(name,benefit,editStep)=>rows.push(quoteRowHTML(rows.length,name,benefit,editStep));
   if(q.elecPlan){
     const p=planById(q.elecPlan);
-    add('Electricity — '+p.name,p.benefit,'elec');
+    add('Electricity — '+p.name,p.benefit+(q.greenpower?' · 100% GreenPower added':''),'elec');
   }
   if(q.gasPlan) add('Natural gas','Simple single rate, bundled on the same account','gasp');
   if(q.lpg) add('LPG bottles',`${q.lpg.qty} × ${LPG.name} — order swaps anytime in the app`,'gasp');
-  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);add('nbn® Internet — '+t.name,t.evening+', unlimited data','net');}
+  if(q.net){const t=NET_TIERS.find(x=>x.id===q.net);add('nbn® Internet — '+t.name,t.evening+', unlimited data'+(q.modem?' · Eero 7 modem included':''),'net');}
   let slot=rows.length;
   const credits=q.moving==='Moving'?100*((q.elecPlan?1:0)+(q.gasPlan?1:0)):0;
   const creditRow=credits?`<div style="background:#F0F7F2;border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:12px;${riseAt(slot*QSTEP)}">
@@ -810,7 +810,7 @@ function modalHTML(){
   const{activeModal,modalClosing}=S;
   if(!activeModal) return'';
   const lo=L();
-  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody}};
+  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody},offerGP:{icon:'',title:'',body:offerGPBody},offerModem:{icon:'',title:'',body:offerModemBody}};
   const m=dyn[activeModal]||MODALS[activeModal];
   if(!m) return'';
   const oAnim=modalClosing?'cpFadeOut .3s cubic-bezier(.64,0,.78,.39) forwards':'cpFade .2s ease';
@@ -886,16 +886,42 @@ function unlockModalBody(){
     <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323">You've unlocked $${amt} in moving credits</span>
     <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Applied to your first bills when your plan is active on 30 Jun 2026 · <span data-modal="credit" class="cp-link">details</span></span>
     ${gasAhead?`<span class="t15" style="font-weight:600;color:#0E7B3D">Add natural gas on the next step and make it $${amt+100}.</span>`:''}
-    <button id="unlock-close" class="cta t15" style="width:100%;max-width:300px;margin-top:8px">Keep going</button>
+    <button data-act="unlock-continue" class="cta t15" style="width:100%;max-width:300px;margin-top:8px">Keep going</button>
   </div>`;
 }
 function maybeUnlock(){
-  if(S.quote.moving!=='Moving'||S.unlockShown)return;
-  if(!S.quote.elecPlan&&!S.quote.gasPlan)return;
+  if(S.quote.moving!=='Moving'||S.unlockShown)return false;
+  if(!S.quote.elecPlan&&!S.quote.gasPlan)return false;
   S.unlockShown=true;
   openModal('unlock');
-  const btn=document.getElementById('unlock-close');
-  if(btn) btn.addEventListener('click',closeModal);
+  return true;
+}
+
+/* ── Post-select add-on offers (declining = closing) ────────── */
+function offerGPBody(){
+  return`<div style="text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323;text-wrap:balance">Add 100% GreenPower to your plan?</span>
+    <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Origin will source electricity from GreenPower-accredited renewable sources to match 100% of your electricity usage.</span>
+    <span class="t28" style="font-weight:700;padding-top:4px">4.50c/kWh</span>
+    <span class="t15" style="font-weight:700;color:#D44500">+ 2,000 Everyday Rewards Points</span>
+    <button data-act="gp-add" class="cta t15" style="width:100%;max-width:300px;margin-top:8px">Add</button>
+    <button data-act="gp-skip" class="qlink t15">No thanks, continue without</button>
+  </div>`;
+}
+function offerModemBody(){
+  const proof=t=>`<div style="display:flex;gap:10px;align-items:flex-start;text-align:left">${tick}<span class="t15 mid">${t}</span></div>`;
+  return`<div style="text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323;text-wrap:balance">Add an Eero 7 modem for $0</span>
+    <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">The latest high-speed modem from Amazon Eero (RRP $300) for $0 when you stay for 24 months.</span>
+    <div style="display:flex;flex-direction:column;gap:9px;padding:4px 0">
+      ${proof('Covers up to 140m² and supports 75+ devices')}
+      ${proof('WiFi 7 for faster speeds')}
+      ${proof('Easy setup — installed in minutes')}
+      ${proof('Smart home ready, built-in eero secure')}
+    </div>
+    <button data-act="modem-add" class="cta t15" style="width:100%;max-width:300px">Add</button>
+    <button data-act="modem-skip" class="qlink t15">No thanks, continue without modem</button>
+  </div>`;
 }
 
 /* ── Flow ───────────────────────────────────────────────────── */
@@ -964,12 +990,21 @@ document.addEventListener('click',e=>{
     case'pick-plan':
       if(S.step==='elec') S.quote.elecPlan=v;
       goStep(nextAfter(S.step));
-      maybeUnlock();break;
+      if(!maybeUnlock()&&S.quote.elecPlan&&!S.quote.ces) openModal('offerGP');
+      break;
+    case'unlock-continue':
+      if(S.quote.elecPlan&&!S.quote.ces) openModal('offerGP');
+      else closeModal();
+      break;
+    case'gp-add':S.quote.greenpower=true;closeModal();break;
+    case'gp-skip':closeModal();break;
+    case'modem-add':S.quote.modem=true;closeModal();render();break;
+    case'modem-skip':closeModal();break;
     case'gas-add':
       S.quote.gasPlan=S.quote.elecPlan||'go';S.quote.lpg=null;
       goStep(nextAfter('gasp'));
       maybeUnlock();break;
-    case'pick-net':S.quote.net=v;goStep(nextAfter('net'));break;
+    case'pick-net':S.quote.net=v;goStep(nextAfter('net'));openModal('offerModem');break;
     case'skip-product':{
       if(S.step==='elec')S.quote.elecPlan=null;
       else if(S.step==='gasp'){S.quote.gasPlan=null;S.quote.lpg=null;}
@@ -1006,7 +1041,7 @@ document.addEventListener('click',e=>{
     case'signup-end':openModal('signupEnd');break;
     case'restart':
       S.step='hero';S.quoteRef=null;S.addrValue='';
-      S.quote={address:'',ces:false,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null};
+      S.quote={address:'',ces:false,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null,greenpower:false,modem:false};
       S.gasTab='gas';S.unlockShown=false;
       S.filters={Solar:false,EV:false,Battery:false};
       S.form={first:'',last:'',email:'',mobile:'',conc:null,life:null};
