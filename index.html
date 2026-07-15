@@ -727,8 +727,11 @@ function quoteHTML(lo){
 }
 
 /* ── Sales form: details → sign-in (account holders) → finish ─ */
-// Prototype stand-in for the account lookup: one seeded customer.
-const SEEDED={email:'sam.sample@origin.com.au',mobile:'0400000000'};
+// Prototype stand-in for the account lookup: seeded account holders.
+const SEEDED=[
+  {email:'sam.sample@origin.com.au',mobile:'0400000000'},
+  {email:'chris_stivala@icloud.com',mobile:'0434392240'}
+];
 const maskEmail=e=>{const[u,d]=(e||'').split('@');return(u?u[0]:'•')+'•••@'+(d||'');};
 const maskMobile=m=>'•••• ••• '+((m||'').replace(/\D/g,'').slice(-3)||'•••');
 function signupFormHTML(lo){
@@ -747,7 +750,6 @@ function signupFormHTML(lo){
   let inner='';
   if(step==='details'){
     inner=`
-    <div class="t15 mid" style="text-align:center;padding-bottom:16px">If you have an Origin account, <a href="#" class="cp-link" style="color:#232323;font-weight:600">sign in for a smoother checkout</a>.</div>
     <h1 class="t28" style="margin:0 0 4px;font-weight:700">Let's start with your details</h1>
     <div class="t13 mut" style="padding:0 2px 18px">About 4 minutes — no credit card needed.</div>
     <div style="display:flex;flex-direction:column;gap:16px">
@@ -771,17 +773,20 @@ function signupFormHTML(lo){
     </div>`;
   }else if(step==='otp'){
     const chosen=S.sf.channel;
+    const em=(S.form.email||'').trim().toLowerCase();
+    const acct=SEEDED.find(a=>a.email===em)||SEEDED[0];
+    const mob=S.form.mobile||acct.mobile;
     const chOpt=(v,label)=>`<button data-act="sf-channel" data-v="${v}" class="q-opt t15${chosen===v?' on':''}">${label}</button>`;
     inner=`
     ${back}
     <h1 class="t28" style="margin:0 0 4px;font-weight:700">Making sure you're you</h1>
     <p class="t15 mid" style="margin:0 0 18px">How would you like to get a one-time code?</p>
     <div style="display:flex;flex-direction:column;gap:10px">
-      ${chOpt('sms','Text a code to '+maskMobile(S.form.mobile||SEEDED.mobile))}
+      ${chOpt('sms','Text a code to '+maskMobile(mob))}
       ${chOpt('email','Email a code to '+maskEmail(S.form.email))}
     </div>
     ${chosen?`
-    <div class="t15 mid" style="text-align:center;padding:22px 0 4px">We sent a code to <strong>${chosen==='sms'?maskMobile(S.form.mobile||SEEDED.mobile):maskEmail(S.form.email)}</strong></div>
+    <div class="t15 mid" style="text-align:center;padding:22px 0 4px">We sent a code to <strong>${chosen==='sms'?maskMobile(mob):maskEmail(S.form.email)}</strong></div>
     <div style="display:flex;gap:8px;justify-content:center;padding:12px 0 6px">
       ${[0,1,2,3,4,5].map(i=>`<input data-otp="${i}" inputmode="numeric" autocomplete="one-time-code" maxlength="1" style="width:${lo.isMobile?'42px':'46px'};height:54px;text-align:center;font-size:22px;font-weight:700;font-family:gordita;color:#232323;border:1.5px solid #C9C9C9;border-radius:12px;outline:none;box-sizing:border-box">`).join('')}
     </div>
@@ -1007,7 +1012,7 @@ document.addEventListener('click',e=>{
     case'sf-continue':{
       const em=(S.form.email||'').trim().toLowerCase();
       const mb=(S.form.mobile||'').replace(/\D/g,'');
-      S.sf.known=em===SEEDED.email||(!!mb&&mb===SEEDED.mobile);
+      S.sf.known=SEEDED.some(a=>em===a.email||(!!mb&&mb===a.mobile));
       S.sf.step=S.sf.known?'password':'finish';
       window.scrollTo(0,0);render();break;}
     case'sf-login':S.sf.step='otp';S.sf.channel=null;window.scrollTo(0,0);render();break;
