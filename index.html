@@ -387,10 +387,10 @@ function qOpt(act,v,label,sub,on){
 function qExistingHTML(lo){
   const inner=`
   ${backLink()}
-  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you new to Origin?</h1>
+  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Are you already with Origin?</h1>
   <div style="display:flex;flex-direction:column;gap:10px">
-    ${qOpt('q-existing','No','New customer',"Welcome — let's get you a great plan",S.quote.existing==='No')}
-    ${qOpt('q-existing','Yes','Existing customer',"We'll find the best offers for you",S.quote.existing==='Yes')}
+    ${qOpt('q-existing','No',"I'm new to Origin","Welcome — let's find you a great plan",S.quote.existing==='No')}
+    ${qOpt('q-existing','Yes',"I'm already a customer","Nice to see you again — we'll find your best offers",S.quote.existing==='Yes')}
   </div>`;
   return focusShell(lo,inner,null);
 }
@@ -398,11 +398,11 @@ function qSituationHTML(lo){
   const ex=S.quote.existing==='Yes';
   const inner=`
   ${backLink()}
-  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">Why are you comparing plans?</h1>
+  <h1 class="t28" style="margin:6px 0 20px;font-weight:700">What brings you here today?</h1>
   <div style="display:flex;flex-direction:column;gap:10px">
     ${qOpt('q-moving','Moving',"I'm moving to a new home",'We can have you connected by tomorrow',S.quote.moving==='Moving')}
     ${ex
-      ?qOpt('q-moving','Renew',"I'm not moving, but I want a better plan",'Compare plans on your current account',S.quote.moving==='Renew')
+      ?qOpt('q-moving','Renew',"I'm not moving, but I want a better plan","We'll compare against what you're on now",S.quote.moving==='Renew')
       :qOpt('q-moving','Switching',"I'm not moving, but I want a better plan",'We handle the switch — nothing to cancel',S.quote.moving==='Switching')}
   </div>`;
   return focusShell(lo,inner,null);
@@ -430,7 +430,7 @@ function servicesHTML(lo){
   const inner=`
   <div id="svc-wrap">
     <h1 id="svc-heading" class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Checking what we can offer at ${shortAddr()}…</h1>
-    <p class="t15 mid" style="margin:0 0 18px;text-align:center">You'll pick plans one at a time — everything is optional.</p>
+    <p class="t15 mid" style="margin:0 0 18px;text-align:center">We'll take it one step at a time — everything's optional.</p>
     <div style="display:flex;flex-direction:column;max-width:380px;margin:0 auto">${rows}</div>
     <div data-reveal style="display:flex;align-items:center;justify-content:center;gap:10px;padding:26px 8px 0;opacity:0">
       <cp-icon name="${assure.icon}" size="28" style="flex-shrink:0"></cp-icon>
@@ -450,7 +450,7 @@ function runReveal(){
   });
   _revealTimers.push(setTimeout(()=>{
     const h=document.getElementById('svc-heading');
-    if(h) h.textContent=`Here's what we can offer at ${shortAddr()}`;
+    if(h) h.textContent=`Good news — here's what we can offer at ${shortAddr()}`;
   },450+rowsN*450+200));
   // Loading-screen semantics: hold a beat on 'Let's get you connected.',
   // fade the page out, then advance — replacing this history entry so
@@ -580,7 +580,7 @@ function elecHTML(lo){
   const plans=elecPlansList();
   const chk=(k,label)=>`<label data-act="filter" data-v="${k}" class="chk${S.filters[k]?' on':''}"><span class="box">${S.filters[k]?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>':''}</span>${label}</label>`;
   const inner=`
-  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your electricity plan</h1>
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Let's find your electricity plan</h1>
   <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
   ${S.quote.moving==='Moving'?`<div class="t13 grn" style="text-align:center;padding-bottom:4px">Moving in? We can have you connected by tomorrow.</div>`:''}
   ${S.quote.ces?`<div class="t13" style="text-align:center;color:#B15A00;font-weight:600;padding-bottom:4px">Embedded network — ${plans.length} plans available at this address <span data-modal="embedded" style="display:inline-flex;width:15px;height:15px;vertical-align:-2px"><cp-icon name="Info" size="15"></cp-icon></span></div>`:''}
@@ -588,7 +588,7 @@ function elecHTML(lo){
   return`${stepperHTML('elec')}
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">${inner}</div>
 ${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo,false)).join(''),plans.length)}
-<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip electricity</button></div>`;
+<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">No thanks, skip electricity</button></div>`;
 }
 function gasCardHTML(){
   // One option, no choice: gas rides along on the same plan family.
@@ -638,16 +638,16 @@ function gaspHTML(lo){
   if(ces){
     // No mains gas at embedded-network addresses: the step is LPG-only.
     const inner=`
-    <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">LPG bottles</h1>
-    <p class="t15 mid" style="margin:0 0 20px;text-align:center">No mains gas at ${shortAddr()} — 45kg exchange bottles, delivered.</p>
+    <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">No mains gas here — how about LPG?</h1>
+    <p class="t15 mid" style="margin:0 0 20px;text-align:center">There's no mains gas at ${shortAddr()}, so we deliver 45kg exchange bottles instead.</p>
     ${lpgCardHTML()}
-    <div style="text-align:center;padding-top:14px"><button data-act="skip-product" class="qlink t15">Skip LPG</button></div>`;
+    <div style="text-align:center;padding-top:14px"><button data-act="skip-product" class="qlink t15">No thanks, skip LPG</button></div>`;
     return focusShell(lo,inner,'gasp');
   }
   const tab=(v,label)=>`<button data-act="gas-tab" data-v="${v}" class="t15" style="border:0;background:none;cursor:pointer;padding:10px 4px;font-weight:${S.gasTab===v?'700':'500'};color:${S.gasTab===v?'#232323':'#909090'};border-bottom:2.5px solid ${S.gasTab===v?'#232323':'transparent'}">${label}</button>`;
   const inner=`
-  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Add gas?</h1>
-  <p class="t15 mid" style="margin:0 0 12px;text-align:center">${S.quote.elecPlan?'Same account as your electricity — one bill.':'One simple option for '+shortAddr()+'.'}</p>
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Want to add natural gas?</h1>
+  <p class="t15 mid" style="margin:0 0 12px;text-align:center">${S.quote.elecPlan?'It sits on the same account as your electricity — one bill.':'One simple option for '+shortAddr()+'.'}</p>
   <div style="display:flex;justify-content:center;gap:22px;border-bottom:1px solid #EFEFEF;margin-bottom:20px">
     ${tab('gas','Natural gas')}${tab('lpg','LPG bottles')}
   </div>
@@ -658,11 +658,11 @@ function gaspHTML(lo){
 function netHTML(lo){
   return`${stepperHTML('net')}
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">
-  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">Choose your internet plan</h1>
+  <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">One last thing — fast internet?</h1>
   <div class="t13 mut" style="text-align:center;padding-bottom:4px">nbn® at ${shortAddr()} — FTTP ready</div>
 </div>
 ${carouselHTML(lo,'car-net',NET_TIERS.map(t=>netCardHTML(t,lo)).join(''),NET_TIERS.length)}
-<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">Skip internet</button></div>`;
+<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">No thanks, skip internet</button></div>`;
 }
 
 /* ── Your quote ─────────────────────────────────────────────── */
@@ -721,7 +721,7 @@ function quoteHTML(lo){
     <div class="t13 mut">${quoteRef()} · ${q.address||'No address'} · ${situation}</div>
   </div>
   ${rows.length?`<div style="display:flex;flex-direction:column;gap:12px">${rows.join('')}</div>`
-    :`<div class="t15 mid" style="text-align:center;padding:20px 0">No products selected yet. <button data-act="edit-step" data-v="elec" class="qlink t15">Choose plans</button></div>`}
+    :`<div class="t15 mid" style="text-align:center;padding:20px 0">You haven't picked anything yet. <button data-act="edit-step" data-v="elec" class="qlink t15">Have a look at plans</button></div>`}
   ${creditRow}
   ${assureCard}
   ${rows.length?`
@@ -749,7 +749,7 @@ function signupFormHTML(lo){
   </div>`;
   const inner=`
   <div class="t15 mid" style="text-align:center;padding-bottom:16px">If you have an Origin account, <a href="#" class="cp-link" style="color:#232323;font-weight:600">sign in for a smoother checkout</a>.</div>
-  <div class="t13 mut" style="padding:0 2px 18px">Set up your account · takes about 4 minutes · no credit card needed</div>
+  <div class="t13 mut" style="padding:0 2px 18px">Let's set up your account — about 4 minutes, no credit card needed.</div>
   <div style="display:flex;flex-direction:column;gap:16px">
     ${field('Full name','name','text','Jane Citizen')}
     ${field('Email','email','email','jane@example.com')}
