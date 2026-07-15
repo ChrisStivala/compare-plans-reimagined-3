@@ -214,7 +214,7 @@ const S={
   addrValue:'',
   filters:{Solar:false,EV:false,Battery:false},
   gasTab:'gas',unlockShown:false,
-  sf:{step:'details',known:false,channel:null},
+  sf:{step:'details',known:false},
   netTier:'500',lpgQty:2,
   sheet:{view:null,planId:null},
   form:{first:'',last:'',email:'',mobile:'',conc:null,life:null},
@@ -728,12 +728,12 @@ function quoteHTML(lo){
 
 /* ── Sales form: details → sign-in (account holders) → finish ─ */
 // Prototype stand-in for the account lookup: seeded account holders.
+// OTP/MFA only fires on risky logins (impossible travel, new IP) —
+// not modelled here, so password alone completes sign-in.
 const SEEDED=[
   {email:'sam.sample@origin.com.au',mobile:'0400000000'},
   {email:'chris_stivala@icloud.com',mobile:'0434392240'}
 ];
-const maskEmail=e=>{const[u,d]=(e||'').split('@');return(u?u[0]:'•')+'•••@'+(d||'');};
-const maskMobile=m=>'•••• ••• '+((m||'').replace(/\D/g,'').slice(-3)||'•••');
 function signupFormHTML(lo){
   const field=(label,key,type,ph)=>`<label style="display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-width:0">
     <span class="t13" style="font-weight:600;color:#505050">${label}</span>
@@ -771,26 +771,6 @@ function signupFormHTML(lo){
       <a href="#" class="t13 cp-link" style="color:#505050">Forgot your password?</a>
       <button data-act="sf-login" class="cta t15" style="width:100%;margin-top:4px">Log in</button>
     </div>`;
-  }else if(step==='otp'){
-    const chosen=S.sf.channel;
-    const em=(S.form.email||'').trim().toLowerCase();
-    const acct=SEEDED.find(a=>a.email===em)||SEEDED[0];
-    const mob=S.form.mobile||acct.mobile;
-    const chOpt=(v,label)=>`<button data-act="sf-channel" data-v="${v}" class="q-opt t15${chosen===v?' on':''}">${label}</button>`;
-    inner=`
-    ${back}
-    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Making sure you're you</h1>
-    <p class="t15 mid" style="margin:0 0 18px">How would you like to get a one-time code?</p>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${chOpt('sms','Text a code to '+maskMobile(mob))}
-      ${chOpt('email','Email a code to '+maskEmail(S.form.email))}
-    </div>
-    ${chosen?`
-    <div class="t15 mid" style="text-align:center;padding:22px 0 4px">We sent a code to <strong>${chosen==='sms'?maskMobile(mob):maskEmail(S.form.email)}</strong></div>
-    <div style="display:flex;gap:8px;justify-content:center;padding:12px 0 6px">
-      ${[0,1,2,3,4,5].map(i=>`<input data-otp="${i}" inputmode="numeric" autocomplete="one-time-code" maxlength="1" style="width:${lo.isMobile?'42px':'46px'};height:54px;text-align:center;font-size:22px;font-weight:700;font-family:gordita;color:#232323;border:1.5px solid #C9C9C9;border-radius:12px;outline:none;box-sizing:border-box">`).join('')}
-    </div>
-    <div class="t13 mid" style="text-align:center">Didn't get a code? <a href="#" class="cp-link">Send another one</a></div>`:''}`;
   }else{
     inner=`
     ${back}
@@ -1015,14 +995,11 @@ document.addEventListener('click',e=>{
       S.sf.known=SEEDED.some(a=>em===a.email||(!!mb&&mb===a.mobile));
       S.sf.step=S.sf.known?'password':'finish';
       window.scrollTo(0,0);render();break;}
-    case'sf-login':S.sf.step='otp';S.sf.channel=null;window.scrollTo(0,0);render();break;
-    case'sf-channel':{
-      S.sf.channel=v;render();
-      const first=document.querySelector('[data-otp="0"]');
-      if(first) first.focus();
-      break;}
+    case'sf-login':
+      S.form.conc=S.form.conc||'No';S.form.life=S.form.life||'No';
+      S.sf.step='finish';window.scrollTo(0,0);render();break;
     case'sf-back':{
-      const order=S.sf.known?['details','password','otp','finish']:['details','finish'];
+      const order=S.sf.known?['details','password','finish']:['details','finish'];
       const i=order.indexOf(S.sf.step);
       if(i>0){S.sf.step=order[i-1];window.scrollTo(0,0);render();}
       break;}
@@ -1033,25 +1010,13 @@ document.addEventListener('click',e=>{
       S.gasTab='gas';S.unlockShown=false;
       S.filters={Solar:false,EV:false,Battery:false};
       S.form={first:'',last:'',email:'',mobile:'',conc:null,life:null};
-      S.sf={step:'details',known:false,channel:null};
+      S.sf={step:'details',known:false};
       window.scrollTo(0,0);render();break;
   }
 });
 document.addEventListener('input',e=>{
   const f=e.target.closest&&e.target.closest('[data-field]');
-  if(f){S.form[f.getAttribute('data-field')]=f.value;return;}
-  const o=e.target.closest&&e.target.closest('[data-otp]');
-  if(o){
-    o.value=o.value.replace(/\D/g,'').slice(-1);
-    const boxes=[...document.querySelectorAll('[data-otp]')];
-    const i=+o.getAttribute('data-otp');
-    if(o.value&&i<boxes.length-1) boxes[i+1].focus();
-    if(boxes.every(b=>b.value)){
-      // Any 6 digits pass in the prototype; account holders land prefilled.
-      if(S.sf.known){S.form.conc=S.form.conc||'No';S.form.life=S.form.life||'No';}
-      setTimeout(()=>{S.sf.step='finish';window.scrollTo(0,0);render();},300);
-    }
-  }
+  if(f) S.form[f.getAttribute('data-field')]=f.value;
 });
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&S.activeModal&&!S.modalClosing) closeModal();
