@@ -474,12 +474,14 @@ function richPriceBlock(plan,gas){
   </div>
 </div>`;
 }
+const creditPill=(inline)=>`<span style="${inline?'align-self:flex-start;':'position:absolute;top:2px;left:14px;'}background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 4px 14px;white-space:nowrap">+ $100 moving credit</span>`;
 function richCardHTML(plan,lo,gas){
   const w=lo.isMobile?300:340;
   const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
+  const credit=(!gas&&S.quote.moving==='Moving')?creditPill(false):'';
   return`<div class="rcard" style="width:${w}px">
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
-    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${tag}</div>
+    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${tag}${credit}</div>
     <div style="text-align:center;padding:0 6px">
       <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323;min-height:46px;display:flex;align-items:center;justify-content:center">${plan.name}</div>
       <div class="t13 mid" style="min-height:40px">${gas?'Natural gas on a simple single rate.':plan.tagline}</div>
@@ -584,6 +586,7 @@ function gasCardHTML(){
   const e=est(plan,true);
   const proof=t=>`<div style="display:flex;gap:10px;align-items:flex-start">${tick}<span class="t15 mid">${t}</span></div>`;
   return`<div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto">
+    ${S.quote.moving==='Moving'?creditPill(true):''}
     <div style="display:flex;align-items:center;gap:14px">
       <div style="width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><cp-icon name="Gas" size="38"></cp-icon></div>
       <div><div class="t13 mut">${plan.name}</div><div class="t17" style="font-weight:700">Natural gas — single rate</div></div>
@@ -879,16 +882,16 @@ function confettiHTML(){
 function unlockModalBody(){
   const q=S.quote;
   const amt=100*((q.elecPlan?1:0)+(q.gasPlan?1:0));
-  const gasAhead=!q.ces&&!q.gasPlan;
   return`${confettiHTML()}
   <div style="text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center">
     <span style="width:56px;height:56px;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center;animation:cpPop .5s cubic-bezier(.34,1.56,.64,1)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span>
     <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323">You've unlocked $${amt} in moving credits</span>
     <span style="font-weight:400;font-size:16px;line-height:26px;color:#505050">Applied to your first bills when your plan is active on 30 Jun 2026 · <span data-modal="credit" class="cp-link">details</span></span>
-    ${gasAhead?`<span class="t15" style="font-weight:600;color:#0E7B3D">Add natural gas on the next step and make it $${amt+100}.</span>`:''}
     <button data-act="unlock-continue" class="cta t15" style="width:100%;max-width:300px;margin-top:8px">Keep going</button>
   </div>`;
 }
+// Fires once, after the gas-step decision — the fuels (and so the
+// credit amount) are settled at that point.
 function maybeUnlock(){
   if(S.quote.moving!=='Moving'||S.unlockShown)return false;
   if(!S.quote.elecPlan&&!S.quote.gasPlan)return false;
@@ -992,12 +995,9 @@ document.addEventListener('click',e=>{
     case'pick-plan':
       if(S.step==='elec') S.quote.elecPlan=v;
       goStep(nextAfter(S.step));
-      if(!maybeUnlock()&&S.quote.elecPlan&&!S.quote.ces) openModal('offerGP');
-      break;
-    case'unlock-continue':
       if(S.quote.elecPlan&&!S.quote.ces) openModal('offerGP');
-      else closeModal();
       break;
+    case'unlock-continue':closeModal();break;
     case'gp-add':S.quote.greenpower=true;closeModal();break;
     case'gp-skip':closeModal();break;
     case'modem-add':S.quote.modem=true;closeModal();render();break;
@@ -1008,12 +1008,15 @@ document.addEventListener('click',e=>{
       maybeUnlock();break;
     case'pick-net':S.quote.net=v;goStep(nextAfter('net'));openModal('offerModem');break;
     case'skip-product':{
-      if(S.step==='elec')S.quote.elecPlan=null;
-      else if(S.step==='gasp'){S.quote.gasPlan=null;S.quote.lpg=null;}
-      else if(S.step==='net')S.quote.net=null;
-      goStep(nextAfter(S.step));break;}
+      const was=S.step;
+      if(was==='elec')S.quote.elecPlan=null;
+      else if(was==='gasp'){S.quote.gasPlan=null;S.quote.lpg=null;}
+      else if(was==='net')S.quote.net=null;
+      goStep(nextAfter(was));
+      if(was==='gasp') maybeUnlock();
+      break;}
     case'lpg-qty':S.lpgQty=+v;render();break;
-    case'lpg-add':S.quote.lpg={qty:S.lpgQty};S.quote.gasPlan=null;goStep(nextAfter('gasp'));break;
+    case'lpg-add':S.quote.lpg={qty:S.lpgQty};S.quote.gasPlan=null;goStep(nextAfter('gasp'));maybeUnlock();break;
     case'est-modal':openModal('estimates');break;
     case'hh-set':S.answers.household=v;render();openModal('estimates');break;
     case'edit-step':goStep(v);break;
