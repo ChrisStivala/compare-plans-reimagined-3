@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 96" width="560" height="96">
+  <!-- Accredited pill -->
+  <rect x="2" y="24" width="150" height="48" rx="24" fill="#00A651"/>
+  <text x="77" y="55" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#ffffff">Accredited</text>
+  <!-- Shield / leaf with check -->
+  <g transform="translate(148,6)">
+    <path d="M42 2 C58 12 74 16 84 16 C84 48 74 74 42 86 C10 74 0 48 0 16 C10 16 26 12 42 2 Z" fill="#00A651"/>
+    <path d="M42 12 C54 19 66 23 74 24 C73 49 64 68 42 78 C20 68 11 49 10 24 C18 23 30 19 42 12 Z" fill="#ffffff"/>
+    <path d="M26 44 L38 56 L60 30" fill="none" stroke="#00A651" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="248" y="48" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="800" fill="#00A651">GreenPower</text>
+  <text x="504" y="24" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#00A651">®</text>
+  <text x="249" y="80" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" fill="#00A651">Renewable Electricity</text>
+</svg>
