@@ -46,6 +46,11 @@ button{font-family:inherit}
 .cp-input::placeholder{color:#909090;font-weight:700;opacity:1}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes floaty{from{transform:translateY(-5px)}to{transform:translateY(6px)}}
+.hmc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hmc-card{position:relative;border:1.5px solid #C9C9C9;border-radius:16px;padding:30px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:#fff;font-family:gordita;min-height:118px;box-sizing:border-box}
+.hmc-card.on{border-color:#232323;box-shadow:0 0 0 1px #232323}
+.hmc-box{position:absolute;top:10px;left:10px;width:20px;height:20px;border:1.5px solid #C9C9C9;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#fff;box-sizing:border-box}
+.hmc-card.on .hmc-box{background:#232323;border-color:#232323}
 @keyframes confetti{0%{opacity:1}100%{transform:translateY(540px) rotate(720deg);opacity:0}}
 @keyframes cpFade{from{opacity:0}to{opacity:1}}
 @keyframes cpFadeOut{from{opacity:1}to{opacity:0}}
@@ -216,6 +221,8 @@ const S={
   filters:{Solar:false,EV:false,Battery:false},
   gasTab:'gas',unlockShown:false,
   sf:{step:'details',known:false},
+  hmc:{step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null},
+  recommended:null,
   netTier:'500',lpgQty:2,
   sheet:{view:null,planId:null},
   form:{first:'',last:'',email:'',mobile:'',conc:null,life:null},
@@ -475,11 +482,12 @@ function richPriceBlock(plan,gas){
 const creditPill=(inline)=>`<span style="${inline?'align-self:flex-start;':'position:absolute;top:2px;left:14px;'}background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 4px 14px;white-space:nowrap">+ $100 moving credit</span>`;
 function richCardHTML(plan,lo,gas){
   const w=lo.isMobile?300:340;
+  const rec=(!gas&&S.recommended===plan.id)?`<span style="position:absolute;top:2px;right:14px;background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">Recommended for you</span>`:'';
   const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
   const credit=(!gas&&S.quote.moving==='Moving')?creditPill(false):'';
-  return`<div class="rcard" style="width:${w}px">
+  return`<div class="rcard" data-plan="${plan.id}" style="width:${w}px">
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
-    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${tag}${credit}</div>
+    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${rec||tag}${credit}</div>
     <div style="text-align:center;padding:0 6px">
       <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323;min-height:46px;display:flex;align-items:center;justify-content:center">${plan.name}</div>
       <div class="t13 mid" style="min-height:40px">${gas?'Natural gas on a simple single rate.':plan.tagline}</div>
@@ -572,7 +580,10 @@ function elecHTML(lo){
   <div class="t13 mut" style="text-align:center;padding-bottom:4px">For ${shortAddr()} · estimates for a <span data-act="est-modal" class="cp-link">${HH[S.answers.household].label.replace(' people',' person')} home</span></div>
   ${S.quote.moving==='Moving'?`<div class="t13 grn" style="text-align:center;padding-bottom:4px">Moving in? We can have you connected by tomorrow.</div>`:''}
   ${S.quote.ces?`<div class="t13" style="text-align:center;color:#B15A00;font-weight:600;padding-bottom:4px">Embedded network — ${plans.length} plans available at this address <span data-modal="embedded" style="display:inline-flex;width:15px;height:15px;vertical-align:-2px"><cp-icon name="Info" size="15"></cp-icon></span></div>`:''}
-  ${S.quote.ces?'':`<div style="display:flex;justify-content:center;gap:18px;padding:12px 0 4px">${chk('Solar','Solar')}${chk('EV','EV')}${chk('Battery','Battery')}</div>`}`;
+  ${S.quote.ces?'':`<div style="display:flex;justify-content:center;gap:18px;padding:12px 0 4px">${chk('Solar','Solar')}${chk('EV','EV')}${chk('Battery','Battery')}</div>`}
+  ${S.quote.ces?'':(S.recommended
+    ?`<div class="t13" style="display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px">${tick}<span class="mid">Your match, based on your answers ·</span><button data-act="hmc-open" class="qlink t13">change answers</button></div>`
+    :`<div style="text-align:center;padding-top:8px"><button data-act="hmc-open" class="qlink t15">Not sure? Help me choose</button></div>`)}`;
   return`${stepperHTML('elec')}
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">${inner}</div>
 ${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo,false)).join(''),plans.length)}
@@ -807,11 +818,115 @@ function saveQuoteModalBody(){
   <button data-act="copy-quote" class="cta t15" style="width:100%">Copy link</button>
   <span id="copy-done" class="t13 grn" style="display:none;text-align:center">Link copied</span>`;
 }
+/* ── Help me choose: conditional wizard → plan recommendation ─ */
+const HMC_BRANDS={tesla:'Tesla',byd:'BYD',merc:'Mercedes-Benz',other:'Another brand'};
+const HMC_COMPAT=['tesla','byd','merc'];
+function hmcNeedsTiebreak(){
+  const h=S.hmc;
+  if(h.have.battery||h.have.solar)return false;
+  if(h.have.ev&&HMC_COMPAT.includes(h.evBrand))return false;
+  if(h.timing==='weekdays'||h.shift==='yes')return false;
+  return true;
+}
+function hmcPath(){
+  const h=S.hmc,p=['have'];
+  if(h.have.ev)p.push('brand');
+  p.push('timing');
+  if(h.timing==='evenings')p.push('shift');
+  p.push('usage');
+  if(hmcNeedsTiebreak())p.push('rewards');
+  p.push('result');
+  return p;
+}
+function hmcResult(){
+  const h=S.hmc;
+  if(h.have.battery)return{id:'battery',reason:`Your ${h.battKwh||10} kWh battery gets 4 free charging hours a day, plus 33c/kWh evening exports.`};
+  if(h.have.ev&&HMC_COMPAT.includes(h.evBrand))return{id:'night',reason:`Your ${HMC_BRANDS[h.evBrand]} works with EV Power Up — charge overnight at 8c/kWh, a full charge from about $5.`};
+  if(h.have.solar)return{id:'solar',reason:`With ${h.solarKw||'6.6'} kW of solar on the roof, a boosted feed-in tariff earns more from every export.`};
+  if(h.timing==='weekdays')return{id:'wd',reason:'You use most of your power on weekdays 9am–5pm — exactly when Shift rates are half price.'};
+  if(h.shift==='yes')return{id:'wd',reason:'Happy to run the big stuff in the middle of the day? Weekday Shift makes 9am–5pm half price.'};
+  if(h.rewards==='yes')return{id:'edr',reason:'Everyday low rates, plus Everyday Rewards points on every dollar of your bills.'};
+  return{id:'go',reason:'Simple everyday low rates with nothing to manage — the easy set-and-forget option.'};
+}
+function helpmeBody(){
+  const h=S.hmc,step=h.step;
+  const back=hmcPath().indexOf(step)>0?`<button data-act="hmc-back" class="t13 mid" style="border:0;background:none;cursor:pointer;padding:0;font-weight:600;align-self:flex-start">← Back</button>`:'';
+  const head=(t,sub)=>`<span style="font-weight:700;font-size:24px;line-height:31px;color:#232323;text-align:center;text-wrap:balance">${t}</span>${sub?`<span class="t15 mid" style="text-align:center">${sub}</span>`:''}`;
+  const opt=(f,v,label,sub)=>qOpt('hmc-set',f+':'+v,label,sub,h[f]===v);
+  if(step==='have'){
+    const size=(on,key,unit)=>on?`<span style="display:flex;align-items:center;gap:6px;border:1.5px solid #E6E6E6;border-radius:10px;padding:4px 10px"><input data-hmc="${key}" value="${S.hmc[key]}" inputmode="decimal" style="width:44px;border:0;outline:none;font-family:gordita;font-size:15px;font-weight:700;color:#232323;text-align:center">${unit}</span>`:'';
+    const card=(v,icon,label,extra)=>`<div data-act="hmc-have" data-v="${v}" class="hmc-card${h.have[v]?' on':''}">
+      <span class="hmc-box">${h.have[v]?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>':''}</span>
+      <span style="height:40px;display:flex;align-items:center">${icon}</span>
+      <span class="t15" style="font-weight:600;text-align:center">${label}</span>
+      ${extra||''}
+    </div>`;
+    return`<div style="display:flex;flex-direction:column;gap:16px">
+    ${head("What's at your place?",'Select all that apply — it changes which plan suits you.')}
+    <div class="hmc-grid">
+      ${card('solar','<img src="project/assets/pictogram-solar.svg" width="38" height="38">','Solar panels',size(h.have.solar,'solarKw','kW'))}
+      ${card('battery','<img src="project/assets/pictogram-battery.svg" width="38" height="38">','Home battery',size(h.have.battery,'battKwh','kWh'))}
+      ${card('ev','<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-4l2-5h9l3 5h1a1 1 0 0 1 1 1v3"></path><path d="M4 16h17"></path><circle cx="7.5" cy="17.5" r="1.8"></circle><circle cx="16.5" cy="17.5" r="1.8"></circle><path d="M11 9.5 9.8 12h2.4L11 14.5" stroke-width="1.5"></path></svg>','Electric vehicle')}
+      ${card('none','<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#909090" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M6 6 L18 18"></path></svg>','None of these')}
+    </div>
+    <button data-act="hmc-next" class="cta t15" style="width:100%">Continue</button></div>`;
+  }
+  if(step==='brand'){
+    return`<div style="display:flex;flex-direction:column;gap:14px">${back}
+    ${head('Who makes your EV?','Some plans unlock automated cheap charging for compatible cars.')}
+    ${opt('evBrand','tesla','Tesla')}${opt('evBrand','byd','BYD')}${opt('evBrand','merc','Mercedes-Benz')}${opt('evBrand','other','Another brand')}
+    <button data-act="ev-models" class="qlink t13" style="align-self:center">See all compatible models</button></div>`;
+  }
+  if(step==='timing'){
+    return`<div style="display:flex;flex-direction:column;gap:14px">${back}
+    ${head('When do you use the most electricity?')}
+    ${opt('timing','evenings','Mornings &amp; evenings','Before work and after school pickups')}
+    ${opt('timing','weekdays','Mostly weekdays 9am–5pm','Working from home, appliances through the day')}
+    ${opt('timing','even','Pretty even, all day','No strong pattern')}</div>`;
+  }
+  if(step==='shift'){
+    return`<div style="display:flex;flex-direction:column;gap:14px">${back}
+    ${head('Could you shift some use to the middle of the day?','Laundry, dishwasher, pool pump — daytime rates can be much cheaper.')}
+    ${opt('shift','yes','Yes, happily','Timers and delayed starts are easy')}
+    ${opt('shift','no','Not really','Our routine is our routine')}</div>`;
+  }
+  if(step==='usage'){
+    return`<div style="display:flex;flex-direction:column;gap:14px">${back}
+    ${head('How much electricity do you use?',"We'll use this to sharpen every estimate you see.")}
+    ${opt('usage','low','Low','About right for a 1–2 person home')}
+    ${opt('usage','medium','Medium','About right for a 2–3 person home')}
+    ${opt('usage','high','High','About right for a 4+ person home')}</div>`;
+  }
+  if(step==='rewards'){
+    return`<div style="display:flex;flex-direction:column;gap:14px">${back}
+    ${head('Want to earn Everyday Rewards points on your bills?')}
+    ${opt('rewards','yes','Yes please','Points on every dollar, redeem at the checkout')}
+    ${opt('rewards','no','No thanks','Just give me simple low rates')}</div>`;
+  }
+  const r=hmcResult(),plan=planById(r.id);
+  return`<div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center">${back}
+  <span style="height:64px;display:flex;align-items:center">${picto(plan,60)}</span>
+  <span class="t13 mut" style="letter-spacing:.04em;text-transform:uppercase;font-weight:700">Our pick for you</span>
+  <span style="font-weight:700;font-size:24px;line-height:31px;color:#232323">${plan.name}</span>
+  <span class="t15 mid">${plan.benefit}</span>
+  <div style="background:#F0F7F2;border-radius:14px;padding:13px 16px;display:flex;gap:10px;align-items:flex-start;text-align:left">${tick}<span class="t15" style="color:#0E7B3D">${r.reason}</span></div>
+  <button data-act="hmc-apply" class="cta t15" style="width:100%;max-width:300px;margin-top:4px">Show my plan</button>
+  <button data-act="hmc-reset" class="qlink t13">Start over</button></div>`;
+}
+function evModelsBody(){
+  const g=(b,models)=>`<div style="display:flex;flex-direction:column;gap:2px"><span class="t15" style="font-weight:700">${b}</span><span class="t15 mid">${models}</span></div>`;
+  return`<div style="display:flex;flex-direction:column;gap:14px">
+  ${g('Tesla','Model 3 · Model Y · Model S · Model X')}
+  ${g('BYD','Atto 3 · Seal · Dolphin · Sealion 6')}
+  ${g('Mercedes-Benz','EQA · EQB · EQC · EQE · EQS')}
+  <span class="t13 mut">More brands are being added to the EV Power Up beta over time.</span>
+  <button data-act="hmc-return" class="cta t15" style="width:100%">Back to questions</button></div>`;
+}
 function modalHTML(){
   const{activeModal,modalClosing}=S;
   if(!activeModal) return'';
   const lo=L();
-  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody},offerGP:{icon:'',title:'',body:offerGPBody},offerModem:{icon:'',title:'',body:offerModemBody}};
+  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody},offerGP:{icon:'',title:'',body:offerGPBody},offerModem:{icon:'',title:'',body:offerModemBody},helpme:{icon:'',title:'',body:helpmeBody},evModels:{icon:'EVPowerup',title:'Compatible EV models',body:evModelsBody}};
   const m=dyn[activeModal]||MODALS[activeModal];
   if(!m) return'';
   const oAnim=modalClosing?'cpFadeOut .3s cubic-bezier(.64,0,.78,.39) forwards':'cpFade .2s ease';
@@ -1016,6 +1131,40 @@ document.addEventListener('click',e=>{
     case'lpg-qty':S.lpgQty=+v;render();break;
     case'lpg-add':S.quote.lpg={qty:S.lpgQty};S.quote.gasPlan=null;goStep(nextAfter('gasp'));maybeUnlock();break;
     case'est-modal':openModal('estimates');break;
+    case'hmc-open':S.hmc.step='have';openModal('helpme');break;
+    case'hmc-return':openModal('helpme');break;
+    case'hmc-have':{
+      if(e.target.closest('input'))break;
+      const h=S.hmc.have;
+      if(v==='none'){h.none=!h.none;if(h.none){h.solar=false;h.battery=false;h.ev=false;}}
+      else{h[v]=!h[v];if(h[v])h.none=false;}
+      openModal('helpme');break;}
+    case'hmc-set':{
+      const[f,val]=v.split(':');
+      S.hmc[f]=val;
+      if(f==='usage')S.answers.household=val==='low'?'s':val==='medium'?'m':'l';
+      const p=hmcPath(),i=p.indexOf(S.hmc.step);
+      S.hmc.step=p[Math.min(i+1,p.length-1)];
+      openModal('helpme');break;}
+    case'hmc-next':{const p=hmcPath(),i=p.indexOf(S.hmc.step);S.hmc.step=p[i+1];openModal('helpme');break;}
+    case'hmc-back':{const p=hmcPath(),i=p.indexOf(S.hmc.step);if(i>0){S.hmc.step=p[i-1];openModal('helpme');}break;}
+    case'hmc-reset':
+      S.hmc={step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null};
+      openModal('helpme');break;
+    case'hmc-apply':{
+      const r=hmcResult();
+      S.recommended=r.id;
+      if(r.id==='solar')S.filters.Solar=true;
+      if(r.id==='night')S.filters.EV=true;
+      if(r.id==='battery')S.filters.Battery=true;
+      closeModal();render();
+      setTimeout(()=>{
+        const row=document.getElementById('car-elec');
+        const card=row&&row.querySelector(`[data-plan="${r.id}"]`);
+        if(row&&card)row.scrollTo({left:Math.max(0,card.offsetLeft-24),behavior:'smooth'});
+      },100);
+      break;}
+    case'ev-models':openModal('evModels');break;
     case'hh-set':S.answers.household=v;render();openModal('estimates');break;
     case'edit-step':goStep(v);break;
     case'go-signup':goStep('signup');break;
@@ -1046,6 +1195,8 @@ document.addEventListener('click',e=>{
       S.step='hero';S.quoteRef=null;S.addrValue='';
       S.quote={address:'',ces:false,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null,greenpower:false,modem:false};
       S.gasTab='gas';S.unlockShown=false;
+      S.hmc={step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null};
+      S.recommended=null;
       S.filters={Solar:false,EV:false,Battery:false};
       S.form={first:'',last:'',email:'',mobile:'',conc:null,life:null};
       S.sf={step:'details',known:false};
@@ -1054,7 +1205,9 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{
   const f=e.target.closest&&e.target.closest('[data-field]');
-  if(f) S.form[f.getAttribute('data-field')]=f.value;
+  if(f){S.form[f.getAttribute('data-field')]=f.value;return;}
+  const hm=e.target.closest&&e.target.closest('[data-hmc]');
+  if(hm) S.hmc[hm.getAttribute('data-hmc')]=hm.value;
 });
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&S.activeModal&&!S.modalClosing) closeModal();
