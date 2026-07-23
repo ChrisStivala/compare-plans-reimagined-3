@@ -1049,6 +1049,40 @@ function openModal(key){
   if(ov) ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   const cl=document.getElementById('modal-close');
   if(cl) cl.addEventListener('click',closeModal);
+  bindSheetDrag();
+}
+// Mobile bottom sheets dismiss on a downward drag (when the sheet's
+// own content is scrolled to the top).
+function bindSheetDrag(){
+  const sheet=document.getElementById('modal-sheet');
+  if(!sheet||!L().isMobile) return;
+  let y0=null,dy=0,dragging=false;
+  sheet.addEventListener('touchstart',e=>{
+    if(sheet.scrollTop>0)return;
+    y0=e.touches[0].clientY;dy=0;dragging=true;
+    sheet.style.transition='none';
+  },{passive:true});
+  sheet.addEventListener('touchmove',e=>{
+    if(!dragging||y0===null)return;
+    dy=e.touches[0].clientY-y0;
+    if(dy>0) sheet.style.transform=`translateY(${dy}px)`;
+  },{passive:true});
+  sheet.addEventListener('touchend',()=>{
+    if(!dragging)return;
+    dragging=false;y0=null;
+    if(dy>100&&!S.modalClosing){
+      const ov=document.getElementById('modal-overlay');
+      sheet.style.transition='transform .28s cubic-bezier(.64,0,.78,.39)';
+      sheet.style.transform='translateY(115%)';
+      if(ov) ov.style.animation='cpFadeOut .28s ease forwards';
+      S.modalClosing=true;
+      clearTimeout(_closeTimer);
+      _closeTimer=setTimeout(()=>{_restoreScroll();S.activeModal=null;S.modalClosing=false;document.getElementById('modal-layer').innerHTML='';},300);
+    }else{
+      sheet.style.transition='transform .22s ease';
+      sheet.style.transform='';
+    }
+  });
 }
 function closeModal(){
   if(S.modalClosing) return;
