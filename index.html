@@ -528,7 +528,7 @@ function richCardHTML(plan,lo){
   const detailsContent=`
     <div style="display:flex;flex-direction:column;gap:6px">
       ${accRow('Contract term','Ongoing')}
-      ${accRow('Rate type','Variable')}
+      ${accRow('Rate type',plan.rates.special?'Time of Use':'Variable')}
       ${accRow('Exit fees','None')}
     </div>
     <a href="#" class="t13" style="display:inline-block;margin-top:12px;font-weight:600;color:#232323;text-decoration:underline;text-underline-offset:3px">Plan terms and conditions</a>`;
