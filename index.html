@@ -186,6 +186,49 @@ const SUGGESTIONS=[
   {addr:'26 Nerli Street, Prestons NSW 2170',ces:false}
 ];
 
+/* ── Audience tiles + benefit popups (new plan-card design) ──── */
+const AUD={
+  go:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5h3V20h-3z"></path><path d="M6.5 11l3.8-6.9a1.7 1.7 0 0 1 3.2.8v4.6h4.9a2 2 0 0 1 2 2.4l-1.2 6.1a2 2 0 0 1-2 1.6H6.5"></path></svg>',
+    tile:'For households who use energy at <b>any time</b> of the day and want a <b>flat rate.</b>',
+    title:'Everyday low variable electricity rates',
+    intro:'Enjoy discounted energy rates year round on a flat rate tariff — simple and easy, with no need to worry about prices changing during the day.',
+    checks:['Want one simple rate at all times','Prefer set-and-forget over time windows','Want everyday low prices with no conditions']},
+  edr:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.5 5.2 5.7.7-4.2 3.9 1.1 5.6L12 16.2l-5.1 2.7 1.1-5.6-4.2-3.9 5.7-.7z"></path></svg>',
+    tile:'For households who want to <b>earn Everyday Rewards points</b> on every bill.',
+    title:'Earn up to 10,000 Everyday Rewards Points',
+    intro:'New customers get 5,000 points for electricity and 5,000 for gas — plus 1 point for every $1 you spend on usage and supply (incl GST).',
+    checks:['Shop at Woolworths regularly','Want points on every dollar of your bills','Have (or can get) an Everyday Rewards number']},
+  wd:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6L18 18M6 18l1.4-1.4M16.6 7.4L18 6"></path></svg>',
+    tile:'For households who mostly use energy <b>between 9am–5pm Mon–Fri</b>',
+    title:'Half price electricity, weekdays 9am–5pm',
+    intro:'Currently, the variable off-peak rate from 9am–5pm Monday to Friday is half price compared to peak rates on this plan*',
+    checks:['Use the most electricity on weekdays','Can run appliances between 9am and 5pm','Have a smart meter (or can get one)'],
+    timing:'<b>Mon–Fri</b><br>Off-peak: 9am–5pm, Peak: all other times<br><b>Sat–Sun</b><br>Peak rates apply'},
+  night:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-3.5l1.8-4.3h8.4l2.6 4.3H19a1 1 0 0 1 1 1V16"></path><path d="M4 16h16"></path><circle cx="7.5" cy="17.3" r="1.7"></circle><circle cx="16.5" cy="17.3" r="1.7"></circle><path d="M15.8 3.5l-1.6 3h2.4l-1.6 3" stroke-width="1.5"></path></svg>',
+    tile:'For <b>EV owners</b> who can charge between <b>midnight and 6am</b>',
+    title:'Fully charge your EV from $5 with 8c/kWh overnight',
+    intro:'Currently, the variable off-peak electricity rate from 12am–6am every night is 8c/kWh*',
+    checks:['Charge your EV overnight','Have a smart meter','Schedule appliances to run overnight'],
+    timing:'Off-peak: 12am–6am every night. Peak: all other times.'},
+  solar:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5.5h12l2 9H4z"></path><path d="M10 5.5l-1 9M14 5.5l1 9M5 10h14"></path><path d="M8 17.5v2h8v-2"></path></svg>',
+    tile:'For homes with <b>solar panels</b> that want more from their exports.',
+    title:'Get a boosted FIT for your solar generation',
+    intro:'Let your solar deliver more value — export more energy to the grid and reduce your bills with a boosted feed-in tariff.',
+    checks:['Have solar panels installed','Export spare energy to the grid','Want more value from every kWh you export']},
+  battery:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="15" rx="2.5"></rect><path d="M10 6V4.5A1 1 0 0 1 11 3.5h2a1 1 0 0 1 1 1V6"></path><path d="M12.8 10.5l-2 3.5h2.4l-2 3.5" stroke-width="1.5"></path></svg>',
+    tile:'For homes with a <b>home battery</b> ready to put to work.',
+    title:'4 hours of 0c/kWh a day plus a higher evening FIT',
+    intro:'The plan built for homes with batteries — 4 free hours of electricity a day and super peak export rates.',
+    checks:['Have a home battery (or battery-ready solar)','Can charge 11am–2pm and 2–3am daily','Want 33c/kWh for your evening exports'],
+    timing:'Free charging hours: 11am–2pm and 2–3am daily.'}
+};
+
 /* ── Money & estimates ──────────────────────────────────────── */
 const HH={
   s:{mult:.82,label:'1–2 people',kwh:'3,200',mj:'2,800'},
@@ -458,66 +501,73 @@ function runReveal(){
 }
 
 /* ── Rich plan cards + carousel (regular compare-plans style) ─ */
-function richPriceBlock(plan,gas){
-  const e=est(plan,gas);
-  return`<div style="border-radius:20px;background:#F6F6F6;padding:22px 20px;display:flex;flex-direction:column;gap:12px">
-  ${gas?'':`<div style="display:flex;flex-direction:column;gap:2px">
-    <div style="display:flex;align-items:baseline;gap:2px">
-      <span style="font-weight:700;font-size:30px;line-height:34px;color:#232323">${plan.discount}</span>
-      <span style="font-weight:700;font-size:16px;color:#232323">%</span>
-    </div>
-    <span class="t13 mid">less than the ${$f(e.ref)} reference price</span>
-  </div>
-  <div style="height:1px;background:rgba(0,0,0,.1)"></div>`}
-  <div style="display:flex;flex-direction:column;gap:4px">
-    <div style="display:flex;align-items:baseline;gap:5px">
-      <span style="font-weight:700;font-size:24px;line-height:30px;color:#232323">${$f(e.cost)}</span>
-      <span class="t13" style="font-weight:700">/year</span>
-      <span data-act="est-modal" style="width:17px;height:17px;color:#A0A0A0;display:inline-flex;cursor:pointer"><cp-icon name="Info" size="17"></cp-icon></span>
-    </div>
-    <span class="t13 mut">${estNote(gas)}</span>
-  </div>
-</div>`;
-}
 const creditPill=(inline)=>`<span style="${inline?'align-self:flex-start;':'position:absolute;top:2px;left:14px;'}background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 4px 14px;white-space:nowrap">+ $100 moving credit</span>`;
-function richCardHTML(plan,lo,gas){
+const accRow=(k,v)=>`<div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">${k}</span><span style="color:#232323">${v}</span></div>`;
+function richCardHTML(plan,lo){
   const w=lo.isMobile?300:340;
-  const rec=(!gas&&S.recommended===plan.id)?`<span style="position:absolute;top:2px;right:14px;background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">Recommended for you</span>`:'';
+  const rec=S.recommended===plan.id?`<span style="position:absolute;top:2px;right:14px;background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">Recommended for you</span>`:'';
   const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
-  const credit=(!gas&&S.quote.moving==='Moving')?creditPill(false):'';
-  return`<div class="rcard" data-plan="${plan.id}" style="width:${w}px">
-  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
-    <div style="height:88px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,84)}${rec||tag}${credit}</div>
-    <div style="text-align:center;padding:0 6px">
-      <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323;min-height:46px;display:flex;align-items:center;justify-content:center">${plan.name}</div>
-      <div class="t13 mid" style="min-height:40px">${gas?'Natural gas on a simple single rate.':plan.tagline}</div>
+  const credit=S.quote.moving==='Moving'?creditPill(false):'';
+  const aud=AUD[plan.id];
+  const monthly=Math.round(est(plan,false).cost/12);
+  const h=HH[S.answers.household];
+  const acc=(key,label,content)=>`
+  <div style="border-top:1.5px solid #E3E3E3">
+    <button data-act="acc-toggle" data-v="${plan.id}-${key}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:18px 8px;cursor:pointer;font-family:gordita;font-weight:500;font-size:14px;line-height:24px;color:#505050;text-align:left">
+      ${label}<span data-acc-icon style="font-size:22px;font-weight:400;color:#232323;line-height:1">+</span>
+    </button>
+    <div id="acc-${plan.id}-${key}" style="display:none;padding:0 8px 20px">${content}</div>
+  </div>`;
+  const detailsContent=`
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${accRow('Contract term','Ongoing')}
+      ${accRow('Rate type','Variable')}
+      ${accRow('Exit fees','None')}
     </div>
-  </div>
-  ${richPriceBlock(plan,gas)}
-  <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">What's included</span>
-      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+    <a href="#" class="t13" style="display:inline-block;margin-top:12px;font-weight:600;color:#232323;text-decoration:underline;text-underline-offset:3px">Plan terms and conditions</a>`;
+  const ratesContent=`
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="t13" style="display:flex;justify-content:space-between;font-weight:700;color:#232323">Usage charges<span>c/kWh</span></div>
+      ${accRow('Peak',plan.rates.peak.replace('c/kWh',''))}
+      ${plan.rates.special?accRow(plan.rates.special.label,plan.rates.special.value.replace('c/kWh','')):''}
     </div>
-    ${plan.included.map(perkRow).join('')}
-    ${(!gas&&plan.addable&&plan.addable.length)?`
-    <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
-      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">Things you can add</span>
-      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+    ${aud&&aud.timing?`<div class="t13 mid" style="padding:10px 0;line-height:20px">${aud.timing}</div>`:''}
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:${aud&&aud.timing?'0':'10px'}">
+      <div class="t13" style="display:flex;justify-content:space-between;font-weight:700;color:#232323">Feed-in<span>c/kWh</span></div>
+      ${accRow('Solar feed-in',plan.rates.fit.replace('c/kWh',''))}
     </div>
-    ${plan.addable.map(perkRow).join('')}`:''}
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">
+      <div class="t13" style="display:flex;justify-content:space-between;font-weight:700;color:#232323">Supply charge<span>c/day</span></div>
+      ${accRow('Daily',plan.rates.supply.replace('c/day',''))}
+    </div>
+    <div class="t13 mut" style="padding-top:12px;line-height:20px">All rates are variable, rounded to 2 decimal places and inclusive of GST. Concessions are not included.</div>`;
+  return`<div class="rcard" data-plan="${plan.id}" style="width:${w}px;border-radius:32px">
+  <div style="display:flex;flex-direction:column;gap:14px;align-items:center;position:relative">
+    <div style="height:96px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,92)}${rec||tag}${credit}</div>
+    <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">${plan.name.replace('Origin ','')}</div>
   </div>
-  <div style="background:#F6F6F6;border-radius:14px;padding:13px 15px;display:flex;flex-direction:column;gap:5px">
-    <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Daily supply</span><span style="font-weight:600">${gas?GAS_RATES.supply:plan.rates.supply}</span></div>
-    <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">${gas?'Usage':'Peak usage'}</span><span style="font-weight:600">${gas?GAS_RATES.usage:plan.rates.peak}</span></div>
-    ${(!gas&&plan.rates.special)?`<div class="t13" style="display:flex;justify-content:space-between"><span class="mid">${plan.rates.special.label}</span><span style="font-weight:600">${plan.rates.special.value}</span></div>`:''}
-    ${gas?'':`<div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Solar feed-in</span><span style="font-weight:600">${plan.rates.fit}</span></div>`}
+  <div data-act="benefit" data-v="${plan.id}" style="background:#FFF0D6;border-radius:${lo.isMobile?24:28}px;padding:${lo.isMobile?'22px 22px':'26px 26px'};display:flex;flex-direction:column;gap:10px;cursor:pointer">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      ${aud?aud.icon:''}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg>
+    </div>
+    <span style="font-size:16px;line-height:24px;color:#232323">${aud?aud.tile:plan.tagline}</span>
   </div>
-  <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+  <div style="padding:0 8px;display:flex;flex-direction:column;gap:8px">
+    <div>
+      <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323">${plan.discount}% less</div>
+      <div style="font-size:14px;line-height:24px;color:#232323">than the reference price</div>
+      <div data-act="est-modal" style="font-weight:700;font-size:16px;line-height:24px;color:#232323;cursor:pointer;padding-top:6px"><span style="text-decoration:underline dotted rgba(0,0,0,.4);text-underline-offset:4px">$${monthly.toLocaleString('en-AU')}/month</span><span style="font-weight:400">*</span></div>
+    </div>
+    <div style="font-size:12px;line-height:20px;color:#505050">Lowest possible price for a home using ${h.kwh}kWh yearly on a residential flat tariff within the ${NETWORK().name} network. Includes GST.</div>
+  </div>
+  <div style="padding:0 4px">
+    ${acc('det','Plan details',detailsContent)}
+    ${acc('rates','Electricity rates',ratesContent)}
+  </div>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
     <button data-act="pick-plan" data-v="${plan.id}" class="cta t15" style="width:100%">Select plan</button>
-    <div style="display:flex;justify-content:center;gap:16px">
-      <a href="#" class="t13 mut">Energy fact sheet</a><a href="#" class="t13 mut">Terms &amp; conditions</a>
-    </div>
+    <div style="font-size:14px;line-height:24px;color:#505050;text-align:center">Change plans anytime.<br>No lock-in contracts.</div>
   </div>
 </div>`;
 }
@@ -588,7 +638,7 @@ function elecHTML(lo){
       Help me choose</button></div>`)}`;
   return`${stepperHTML('elec')}
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">${inner}</div>
-${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo,false)).join(''),plans.length)}
+${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo)).join(''),plans.length)}
 <div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">No thanks, skip electricity</button></div>`;
 }
 function gasCardHTML(){
@@ -820,6 +870,20 @@ function saveQuoteModalBody(){
   <button data-act="copy-quote" class="cta t15" style="width:100%">Copy link</button>
   <span id="copy-done" class="t13 grn" style="display:none;text-align:center">Link copied</span>`;
 }
+/* ── Plan benefit popup (from the audience tile) ────────────── */
+function benefitBody(){
+  const plan=planById(S.benefitPlan)||BASE_PLANS[0];
+  const aud=AUD[plan.id]||{};
+  const check=t=>`<div style="display:flex;gap:12px;align-items:center"><span style="width:26px;height:26px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span><span class="t15" style="color:#232323">${t}</span></div>`;
+  return`<div style="display:flex;flex-direction:column;gap:14px">
+  ${aud.icon||''}
+  <span style="font-weight:700;font-size:26px;line-height:34px;color:#232323;text-wrap:balance">${aud.title||plan.benefit}</span>
+  <span style="font-size:16px;line-height:26px;color:#505050">${aud.intro||''}</span>
+  <span class="t15" style="font-weight:700;color:#232323;padding-top:4px">This plan might be right if you:</span>
+  <div style="display:flex;flex-direction:column;gap:14px">${(aud.checks||[]).map(check).join('')}</div>
+</div>`;
+}
+
 /* ── Help me choose: conditional wizard → plan recommendation ─ */
 const HMC_BRANDS={tesla:'Tesla',byd:'BYD',merc:'Mercedes-Benz',other:'Another brand'};
 const HMC_COMPAT=['tesla','byd','merc'];
@@ -928,7 +992,7 @@ function modalHTML(){
   const{activeModal,modalClosing}=S;
   if(!activeModal) return'';
   const lo=L();
-  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody},offerGP:{icon:'',title:'',body:offerGPBody},offerModem:{icon:'',title:'',body:offerModemBody},helpme:{icon:'',title:'',body:helpmeBody},evModels:{icon:'EVPowerup',title:'Compatible EV models',body:evModelsBody}};
+  const dyn={estimates:{icon:'Info',title:'How estimates are calculated',body:estimatesModalBody},savequote:{icon:'Promo',title:'Save your quote',body:saveQuoteModalBody},unlock:{icon:'',title:'',body:unlockModalBody},benefit:{icon:'',title:'',body:benefitBody},offerGP:{icon:'',title:'',body:offerGPBody},offerModem:{icon:'',title:'',body:offerModemBody},helpme:{icon:'',title:'',body:helpmeBody},evModels:{icon:'EVPowerup',title:'Compatible EV models',body:evModelsBody}};
   const m=dyn[activeModal]||MODALS[activeModal];
   if(!m) return'';
   const oAnim=modalClosing?'cpFadeOut .3s cubic-bezier(.64,0,.78,.39) forwards':'cpFade .2s ease';
@@ -1133,6 +1197,16 @@ document.addEventListener('click',e=>{
     case'lpg-qty':S.lpgQty=+v;render();break;
     case'lpg-add':S.quote.lpg={qty:S.lpgQty};S.quote.gasPlan=null;goStep(nextAfter('gasp'));maybeUnlock();break;
     case'est-modal':openModal('estimates');break;
+    case'benefit':S.benefitPlan=v;openModal('benefit');break;
+    case'acc-toggle':{
+      const acc=document.getElementById('acc-'+v);
+      if(acc){
+        const open=acc.style.display!=='none';
+        acc.style.display=open?'none':'block';
+        const ic=el.querySelector('[data-acc-icon]');
+        if(ic) ic.textContent=open?'+':'\u00d7';
+      }
+      break;}
     case'hmc-open':S.hmc.step='have';openModal('helpme');break;
     case'hmc-return':openModal('helpme');break;
     case'hmc-have':{
