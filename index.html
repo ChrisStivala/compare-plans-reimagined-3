@@ -226,7 +226,28 @@ const AUD={
     title:'4 hours of 0c/kWh a day plus a higher evening FIT',
     intro:'The plan built for homes with batteries — 4 free hours of electricity a day and super peak export rates.',
     checks:['Have a home battery (or battery-ready solar)','Can charge 11am–2pm and 2–3am daily','Want 33c/kWh for your evening exports'],
-    timing:'Free charging hours: 11am–2pm and 2–3am daily.'}
+    timing:'Free charging hours: 11am–2pm and 2–3am daily.'},
+  gas:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c1.5 3-4.5 5.5-4.5 10a4.5 4.5 0 0 0 9 0c0-2-1-3.5-2-4.5.2 1.5-.5 2.5-1.5 3-.3-2-.4-4.6-1-8.5z"></path></svg>',
+    tile:'For homes with a <b>mains gas connection</b> — hot water, heating and cooktop.',
+    title:'One simple gas rate, on the same account',
+    intro:'Natural gas rides along with your electricity — one account, one bill, connected together.',
+    checks:['Want everything on one bill','Have gas hot water, heating or a cooktop','Like no lock-in — cancel anytime']}
+};
+const WIFI_ICON='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 9.5a12.5 12.5 0 0 1 17 0"></path><path d="M6.5 12.7a8.2 8.2 0 0 1 11 0"></path><path d="M9.3 15.7a4.2 4.2 0 0 1 5.4 0"></path><circle cx="12" cy="19" r="1.5" fill="#232323" stroke="none"></circle></svg>';
+const NET_AUD={
+  '100':{icon:WIFI_ICON,tile:'For couples and small households who <b>stream and browse</b>.',
+    title:'Great everyday internet',intro:'~92 Mbps typical evening speed — smooth streaming and browsing for smaller households.',
+    checks:['Stream in HD on a couple of screens','Browse, bank and video call','Have 1–3 people at home']},
+  '250':{icon:WIFI_ICON,tile:'For busy households <b>streaming in 4K</b> on multiple screens.',
+    title:'Room for the whole household',intro:'~230 Mbps typical evening speed — 4K streaming on multiple screens at once.',
+    checks:['Stream 4K on multiple screens','Have several people online at once','Want faster downloads']},
+  '500':{icon:WIFI_ICON,tile:'For households who <b>work from home, game and stream</b>.',
+    title:'Our most popular speed',intro:'~480 Mbps typical evening speed — headroom for work, gaming and streaming at once.',
+    checks:['Work from home on video calls','Game online with low lag','Stream while others download']},
+  '1000':{icon:WIFI_ICON,tile:'For power users with <b>heavy uploads and gaming</b>.',
+    title:'Our fastest nbn® speed',intro:'~780 Mbps typical evening speed — for big households and serious uploads.',
+    checks:['Upload big files fast','Run a smart home full of devices','Want the fastest we offer']}
 };
 
 /* ── Money & estimates ──────────────────────────────────────── */
@@ -581,31 +602,50 @@ function richCardHTML(plan,lo){
 function netCardHTML(t,lo){
   const w=lo.isMobile?300:340;
   const tag=t.tag?`<span style="background:${t.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:16px 16px 16px 5px;border:4px solid #fff;white-space:nowrap">${t.tag}</span>`:'';
-  return`<div class="rcard" style="width:${w}px">
-  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
+  const aud=NET_AUD[t.id];
+  const acc=(key,label,content)=>`
+  <div style="border-top:1.5px solid #E3E3E3">
+    <button data-act="acc-toggle" data-v="${key}" data-acc-btn="${key}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:18px 8px;cursor:pointer;font-family:gordita;font-weight:500;font-size:14px;line-height:24px;color:#505050;text-align:left">
+      ${label}<span data-acc-icon style="font-size:22px;font-weight:400;color:#232323;line-height:1">${S.accOpen===key?'×':'+'}</span>
+    </button>
+    <div data-acc="${key}" style="display:${S.accOpen===key?'block':'none'};padding:0 8px 20px">${content}</div>
+  </div>`;
+  return`<div class="rcard" data-plan="${t.id}" style="width:${w}px;border-radius:32px">
+  <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
     <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%"><cp-icon name="Bolt" size="56"></cp-icon>${tag?`<span style="flex-shrink:0;margin-left:-2px;transform:translateY(-18px)">${tag}</span>`:''}</div>
-    <div style="text-align:center;padding:0 6px">
-      <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323">nbn® ${t.name}</div>
-      <div class="t13 mid" style="min-height:40px">${t.best}</div>
-    </div>
+    <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">nbn® ${t.name}</div>
   </div>
-  <div style="border-radius:20px;background:#F6F6F6;padding:22px 20px;display:flex;flex-direction:column;gap:4px">
-    <div style="display:flex;align-items:baseline;gap:5px">
-      <span style="font-weight:700;font-size:30px;line-height:34px;color:#232323">$${t.price}</span>
-      <span class="t13" style="font-weight:700">/month</span>
+  <div data-act="benefit" data-v="${t.id}" style="background:#FFF0D6;border-radius:${lo.isMobile?24:28}px;padding:${lo.isMobile?'22px 22px':'26px 26px'};display:flex;flex-direction:column;gap:10px;cursor:pointer">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      ${aud?aud.icon:''}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg>
     </div>
-    <span class="t13 mid">${t.evening}</span>
-    <span class="t13 mut">Month to month for new nbn connections. Speeds may vary by address and network.</span>
+    <span style="font-size:16px;line-height:24px;color:#232323">${aud?aud.tile:t.best}</span>
   </div>
-  <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span class="t13" style="font-weight:600;color:#232323;white-space:nowrap">What's included</span>
-      <span style="flex:1 1 12px;height:1px;background:#D8D8D8"></span>
+  <div style="padding:0 8px;display:flex;flex-direction:column;gap:8px">
+    <div>
+      <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323">${t.evening.replace(' typical evening speed','')}</div>
+      <div style="font-size:14px;line-height:24px;color:#232323">typical evening speed</div>
+      <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;padding-top:6px">$${t.price}/month</div>
     </div>
-    ${NET_PERKS.map(x=>`<div style="display:flex;gap:12px;align-items:flex-start">${tick}<span style="font-size:14px;line-height:22px;color:#505050">${x}</span></div>`).join('')}
+    <div style="font-size:12px;line-height:20px;color:#505050">Month to month for new nbn connections. Speeds may vary by address and network. Includes GST.</div>
   </div>
-  <div style="margin-top:auto">
+  <div style="padding:0 4px">
+    ${acc('det','Plan details',`
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Contract term</span><span style="color:#232323">Month to month</span></div>
+        <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Connection</span><span style="color:#232323">nbn® FTTP</span></div>
+        <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Exit fees</span><span style="color:#232323">None</span></div>
+      </div>
+      <a href="#" class="t13" style="display:inline-block;margin-top:12px;font-weight:600;color:#232323;text-decoration:underline;text-underline-offset:3px">Plan terms and conditions</a>`)}
+    ${acc('rates',"What's included",`
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${NET_PERKS.map(x=>`<div style="display:flex;gap:12px;align-items:flex-start">${tick}<span style="font-size:14px;line-height:22px;color:#505050">${x}</span></div>`).join('')}
+      </div>`)}
+  </div>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
     <button data-act="pick-net" data-v="${t.id}" class="cta t15" style="width:100%">Select plan</button>
+    <div style="font-size:14px;line-height:24px;color:#505050;text-align:center">Change plans anytime.<br>No lock-in contracts.</div>
   </div>
 </div>`;
 }
@@ -651,31 +691,54 @@ ${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo)).join(''),plans.len
 function gasCardHTML(){
   // One option, no choice: gas rides along on the same plan family.
   const plan=planById(S.quote.elecPlan)||BASE_PLANS[0];
-  const e=est(plan,true);
-  const proof=t=>`<div style="display:flex;gap:10px;align-items:flex-start">${tick}<span class="t15 mid">${t}</span></div>`;
-  return`<div style="background:#fff;border:1.5px solid #E6E6E6;border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto">
+  const monthly=Math.round(est(plan,true).cost/12);
+  const h=HH[S.answers.household];
+  const aud=AUD.gas;
+  const acc=(key,label,content)=>`
+  <div style="border-top:1.5px solid #E3E3E3">
+    <button data-act="acc-toggle" data-v="${key}" data-acc-btn="${key}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:18px 8px;cursor:pointer;font-family:gordita;font-weight:500;font-size:14px;line-height:24px;color:#505050;text-align:left">
+      ${label}<span data-acc-icon style="font-size:22px;font-weight:400;color:#232323;line-height:1">${S.accOpen===key?'×':'+'}</span>
+    </button>
+    <div data-acc="${key}" style="display:${S.accOpen===key?'block':'none'};padding:0 8px 20px">${content}</div>
+  </div>`;
+  return`<div style="background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:26px 18px;display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto">
     ${S.quote.moving==='Moving'?creditPill(true):''}
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><cp-icon name="Gas" size="38"></cp-icon></div>
-      <div><div class="t13 mut">${plan.name}</div><div class="t17" style="font-weight:700">Natural gas — single rate</div></div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:9px">
-      ${proof('Same account, one bill')}
-      ${proof('Connected together — nothing extra to do')}
-      ${proof('No lock-in, cancel anytime')}
-    </div>
-    <div style="display:flex;flex-direction:column;gap:3px">
-      <div style="display:flex;align-items:center;gap:7px">
-        <span class="t28" style="font-weight:700">${$f(e.cost)}<span class="t13" style="font-weight:600">/year</span></span>
-        <span data-act="est-modal" style="width:18px;height:18px;color:#909090;display:inline-flex;cursor:pointer"><cp-icon name="Info" size="18"></cp-icon></span>
+    <div style="height:72px;display:flex;align-items:center;justify-content:center"><cp-icon name="Gas" size="60"></cp-icon></div>
+    <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">Natural gas</div>
+    <div data-act="benefit" data-v="gas" style="background:#FFF0D6;border-radius:24px;padding:22px 22px;display:flex;flex-direction:column;gap:10px;cursor:pointer">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        ${aud.icon}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg>
       </div>
-      <div class="t13 mut">${estNote(true)}</div>
+      <span style="font-size:16px;line-height:24px;color:#232323">${aud.tile}</span>
     </div>
-    <div style="background:#F7F7F7;border-radius:14px;padding:13px 15px;display:flex;flex-direction:column;gap:5px">
-      <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Daily supply</span><span style="font-weight:600">${GAS_RATES.supply}</span></div>
-      <div class="t13" style="display:flex;justify-content:space-between"><span class="mid">Usage</span><span style="font-weight:600">${GAS_RATES.usage}</span></div>
+    <div style="padding:0 8px;display:flex;flex-direction:column;gap:8px">
+      <div>
+        <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323">Single rate</div>
+        <div style="font-size:14px;line-height:24px;color:#232323">on the same account as your electricity</div>
+        <div data-act="est-modal" style="font-weight:700;font-size:16px;line-height:24px;color:#232323;cursor:pointer;padding-top:6px"><span style="text-decoration:underline dotted rgba(0,0,0,.4);text-underline-offset:4px">$${monthly.toLocaleString('en-AU')}/month</span><span style="font-weight:400">*</span></div>
+      </div>
+      <div style="font-size:12px;line-height:20px;color:#505050">Estimated for a home using ~${h.mj} MJ yearly on a single gas rate in the ${NETWORK().name} network. Includes GST.</div>
     </div>
-    <button data-act="gas-add" class="cta t15" style="width:100%">Add natural gas</button>
+    <div style="padding:0 4px">
+      ${acc('det','Plan details',`
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Contract term</span><span style="color:#232323">Ongoing</span></div>
+          <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Rate type</span><span style="color:#232323">Single rate</span></div>
+          <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Exit fees</span><span style="color:#232323">None</span></div>
+        </div>
+        <a href="#" class="t13" style="display:inline-block;margin-top:12px;font-weight:600;color:#232323;text-decoration:underline;text-underline-offset:3px">Plan terms and conditions</a>`)}
+      ${acc('rates','Gas rates',`
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Daily supply</span><span style="color:#232323">${GAS_RATES.supply}</span></div>
+          <div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">Usage</span><span style="color:#232323">${GAS_RATES.usage}</span></div>
+        </div>
+        <div class="t13 mut" style="padding-top:12px;line-height:20px">All rates are variable, rounded to 2 decimal places and inclusive of GST. Concessions are not included.</div>`)}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <button data-act="gas-add" class="cta t15" style="width:100%">Add natural gas</button>
+      <div style="font-size:14px;line-height:24px;color:#505050;text-align:center">Change plans anytime.<br>No lock-in contracts.</div>
+    </div>
   </div>`;
 }
 function lpgCardHTML(){
@@ -700,7 +763,7 @@ function gaspHTML(lo){
     ${backLink()}
     <h1 class="t28" style="margin:0 0 6px;font-weight:700;text-align:center">No mains gas here — how about LPG?</h1>
     <p class="t15 mid" style="margin:0 0 20px;text-align:center">There's no mains gas at ${shortAddr()}, so we deliver 45kg exchange bottles instead.</p>
-    ${lpgCardHTML()}
+    <div style="background:#F7F7F7;border-radius:28px;padding:16px 12px">${lpgCardHTML()}</div>
     <div style="text-align:center;padding-top:14px"><button data-act="skip-product" class="qlink t15">No thanks, skip LPG</button></div>`;
     return focusShell(lo,inner,'gasp');
   }
@@ -712,7 +775,7 @@ function gaspHTML(lo){
   <div style="display:flex;justify-content:center;gap:22px;border-bottom:1px solid #EFEFEF;margin-bottom:20px">
     ${tab('gas','Natural gas')}${tab('lpg','LPG bottles')}
   </div>
-  ${S.gasTab==='gas'?gasCardHTML():lpgCardHTML()}
+  <div style="background:#F7F7F7;border-radius:28px;padding:16px 12px">${S.gasTab==='gas'?gasCardHTML():lpgCardHTML()}</div>
   <div style="text-align:center;padding-top:14px"><button data-act="skip-product" class="qlink t15">No thanks, skip gas</button></div>`;
   return focusShell(lo,inner,'gasp');
 }
@@ -881,12 +944,11 @@ function saveQuoteModalBody(){
 }
 /* ── Plan benefit popup (from the audience tile) ────────────── */
 function benefitBody(){
-  const plan=planById(S.benefitPlan)||BASE_PLANS[0];
-  const aud=AUD[plan.id]||{};
+  const aud=AUD[S.benefitPlan]||NET_AUD[S.benefitPlan]||{};
   const check=t=>`<div style="display:flex;gap:12px;align-items:center"><span style="width:26px;height:26px;flex-shrink:0;border-radius:50%;background:#0E7B3D;display:inline-flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17.5 L19 7"></path></svg></span><span class="t15" style="color:#232323">${t}</span></div>`;
   return`<div style="display:flex;flex-direction:column;gap:14px">
   ${aud.icon||''}
-  <span style="font-weight:700;font-size:26px;line-height:34px;color:#232323;text-wrap:balance">${aud.title||plan.benefit}</span>
+  <span style="font-weight:700;font-size:26px;line-height:34px;color:#232323;text-wrap:balance">${aud.title||''}</span>
   <span style="font-size:16px;line-height:26px;color:#505050">${aud.intro||''}</span>
   <span class="t15" style="font-weight:700;color:#232323;padding-top:4px">This plan might be right if you:</span>
   <div style="display:flex;flex-direction:column;gap:14px">${(aud.checks||[]).map(check).join('')}</div>
