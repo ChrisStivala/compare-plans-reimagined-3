@@ -116,7 +116,7 @@ const ADDON_PLANS={
     rates:{supply:'103c/day',peak:'55.1c/kWh',special:{label:'Overnight 12am–6am',value:'8c/kWh'},fit:'5c/kWh'},
     included:[{icon:'EVCharge',text:'Fully charge your EV from $5 with 8c/kWh overnight',modal:'night'},CAL],
     addable:[GP]},
-  Battery:{id:'battery',name:'Origin Battery IQ',tagline:'Power your home with 4 free hours of power a day.',
+  Battery:{id:'battery',name:'Origin Battery Charge',tagline:'Power your home with 4 free hours of power a day.',
     benefit:'4 free hours of power every day',
     tag:'Just launched',tagColor:'#FF6024',
     discount:'10',ref:'$2,411',yearly:'$1,497',gasYearly:'$2,218',
@@ -222,7 +222,7 @@ const AUD={
     checks:['Have solar panels installed','Export spare energy to the grid','Want more value from every kWh you export']},
   battery:{
     icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="15" rx="2.5"></rect><path d="M10 6V4.5A1 1 0 0 1 11 3.5h2a1 1 0 0 1 1 1V6"></path><path d="M12.8 10.5l-2 3.5h2.4l-2 3.5" stroke-width="1.5"></path></svg>',
-    tile:'For homes with a <b>home battery</b> ready to put to work.',
+    tile:'For <b>homes with batteries</b> that want <b>4 hours free electricity</b> every day.',
     title:'4 hours of 0c/kWh a day plus a higher evening FIT',
     intro:'The plan built for homes with batteries — 4 free hours of electricity a day and super peak export rates.',
     checks:['Have a home battery (or battery-ready solar)','Can charge 11am–2pm and 2–3am daily','Want 33c/kWh for your evening exports'],
@@ -264,6 +264,7 @@ const S={
   filters:{Solar:false,EV:false,Battery:false},
   gasTab:'gas',unlockShown:false,
   sf:{step:'details',known:false},
+  accOpen:null,
   hmc:{step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null},
   recommended:null,
   netTier:'500',lpgQty:2,
@@ -507,16 +508,15 @@ function richCardHTML(plan,lo){
   const w=lo.isMobile?300:340;
   const rec=S.recommended===plan.id?`<span style="position:absolute;top:2px;right:14px;background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">Recommended for you</span>`:'';
   const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
-  const credit=S.quote.moving==='Moving'?creditPill(false):'';
   const aud=AUD[plan.id];
   const monthly=Math.round(est(plan,false).cost/12);
   const h=HH[S.answers.household];
   const acc=(key,label,content)=>`
   <div style="border-top:1.5px solid #E3E3E3">
-    <button data-act="acc-toggle" data-v="${plan.id}-${key}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:18px 8px;cursor:pointer;font-family:gordita;font-weight:500;font-size:14px;line-height:24px;color:#505050;text-align:left">
-      ${label}<span data-acc-icon style="font-size:22px;font-weight:400;color:#232323;line-height:1">+</span>
+    <button data-act="acc-toggle" data-v="${key}" data-acc-btn="${key}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:18px 8px;cursor:pointer;font-family:gordita;font-weight:500;font-size:14px;line-height:24px;color:#505050;text-align:left">
+      ${label}<span data-acc-icon style="font-size:22px;font-weight:400;color:#232323;line-height:1">${S.accOpen===key?'×':'+'}</span>
     </button>
-    <div id="acc-${plan.id}-${key}" style="display:none;padding:0 8px 20px">${content}</div>
+    <div data-acc="${key}" style="display:${S.accOpen===key?'block':'none'};padding:0 8px 20px">${content}</div>
   </div>`;
   const detailsContent=`
     <div style="display:flex;flex-direction:column;gap:6px">
@@ -543,7 +543,7 @@ function richCardHTML(plan,lo){
     <div class="t13 mut" style="padding-top:12px;line-height:20px">All rates are variable, rounded to 2 decimal places and inclusive of GST. Concessions are not included.</div>`;
   return`<div class="rcard" data-plan="${plan.id}" style="width:${w}px;border-radius:32px">
   <div style="display:flex;flex-direction:column;gap:14px;align-items:center;position:relative">
-    <div style="height:96px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,92)}${rec||tag}${credit}</div>
+    <div style="height:96px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,92)}${rec||tag}</div>
     <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">${plan.name.replace('Origin ','')}</div>
   </div>
   <div data-act="benefit" data-v="${plan.id}" style="background:#FFF0D6;border-radius:${lo.isMobile?24:28}px;padding:${lo.isMobile?'22px 22px':'26px 26px'};display:flex;flex-direction:column;gap:10px;cursor:pointer">
@@ -1199,13 +1199,17 @@ document.addEventListener('click',e=>{
     case'est-modal':openModal('estimates');break;
     case'benefit':S.benefitPlan=v;openModal('benefit');break;
     case'acc-toggle':{
-      const acc=document.getElementById('acc-'+v);
-      if(acc){
-        const open=acc.style.display!=='none';
-        acc.style.display=open?'none':'block';
-        const ic=el.querySelector('[data-acc-icon]');
-        if(ic) ic.textContent=open?'+':'\u00d7';
-      }
+      // One control across all cards: opening a section opens it on
+      // every card and closes the other section (no re-render, so the
+      // carousel scroll position survives).
+      S.accOpen=S.accOpen===v?null:v;
+      document.querySelectorAll('[data-acc]').forEach(p=>{
+        p.style.display=p.getAttribute('data-acc')===S.accOpen?'block':'none';
+      });
+      document.querySelectorAll('[data-acc-btn]').forEach(b=>{
+        const ic=b.querySelector('[data-acc-icon]');
+        if(ic) ic.textContent=b.getAttribute('data-acc-btn')===S.accOpen?'\u00d7':'+';
+      });
       break;}
     case'hmc-open':S.hmc.step='have';openModal('helpme');break;
     case'hmc-return':openModal('helpme');break;
@@ -1270,7 +1274,7 @@ document.addEventListener('click',e=>{
     case'restart':
       S.step='hero';S.quoteRef=null;S.addrValue='';
       S.quote={address:'',ces:false,moving:null,elecPlan:null,gasPlan:null,lpg:null,net:null,greenpower:false,modem:false};
-      S.gasTab='gas';S.unlockShown=false;
+      S.gasTab='gas';S.unlockShown=false;S.accOpen=null;
       S.hmc={step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null};
       S.recommended=null;
       S.filters={Solar:false,EV:false,Battery:false};
