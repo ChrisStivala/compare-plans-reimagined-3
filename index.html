@@ -232,23 +232,33 @@ const AUD={
     tile:'For homes with a <b>mains gas connection</b> — hot water, heating and cooktop.',
     title:'One simple gas rate, on the same account',
     intro:'Natural gas rides along with your electricity — one account, one bill, connected together.',
-    checks:['Want everything on one bill','Have gas hot water, heating or a cooktop','Like no lock-in — cancel anytime']}
+    checks:['Want everything on one bill','Have gas hot water, heating or a cooktop','Like no lock-in — cancel anytime']},
+  lpg:{
+    icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg>',
+    tile:'For homes <b>without mains gas</b> — bottled gas for your cooktop, hot water and heating.',
+    title:'Bottled gas, delivered and swapped',
+    intro:"LPG is the same gas your appliances love, delivered in 45kg bottles when there's no mains connection. We deliver, you swap when a bottle runs empty — order anytime in the app.",
+    checks:['Have no mains gas at your address','Use gas appliances — cooktop, hot water or heating','Want deliveries scheduled around you']}
 };
-const WIFI_ICON='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 9.5a12.5 12.5 0 0 1 17 0"></path><path d="M6.5 12.7a8.2 8.2 0 0 1 11 0"></path><path d="M9.3 15.7a4.2 4.2 0 0 1 5.4 0"></path><circle cx="12" cy="19" r="1.5" fill="#232323" stroke="none"></circle></svg>';
 const NET_AUD={
-  '100':{icon:WIFI_ICON,tile:'For couples and small households who <b>stream and browse</b>.',
+  '100':{icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="12" rx="2"></rect><path d="M9 20.5h6M12 17v3.5"></path></svg>',
+    tile:'For couples and small households who <b>stream and browse</b>.',
     title:'Great everyday internet',intro:'~92 Mbps typical evening speed — smooth streaming and browsing for smaller households.',
     checks:['Stream in HD on a couple of screens','Browse, bank and video call','Have 1–3 people at home']},
-  '250':{icon:WIFI_ICON,tile:'For busy households <b>streaming in 4K</b> on multiple screens.',
+  '250':{icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.5" width="12" height="9" rx="1.5"></rect><path d="M7 20h4M9 16.5V20"></path><rect x="16.5" y="5" width="5" height="9" rx="1.2"></rect><path d="M19 16.5v.01"></path></svg>',
+    tile:'For busy households <b>streaming in 4K</b> on multiple screens.',
     title:'Room for the whole household',intro:'~230 Mbps typical evening speed — 4K streaming on multiple screens at once.',
     checks:['Stream 4K on multiple screens','Have several people online at once','Want faster downloads']},
-  '500':{icon:WIFI_ICON,tile:'For households who <b>work from home, game and stream</b>.',
+  '500':{icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6h15v9h-15z"></path><path d="M2.5 18h19l-1.4 2h-16.2z"></path><circle cx="12" cy="10.5" r="2"></circle><path d="M12 8.5v-.01"></path></svg>',
+    tile:'For households who <b>work from home, game and stream</b>.',
     title:'Our most popular speed',intro:'~480 Mbps typical evening speed — headroom for work, gaming and streaming at once.',
     checks:['Work from home on video calls','Game online with low lag','Stream while others download']},
-  '1000':{icon:WIFI_ICON,tile:'For power users with <b>heavy uploads and gaming</b>.',
+  '1000':{icon:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4.5c3.5.6 6 3 6.5 6.5l-4.2 4.2c-2-.3-4.2-2.5-4.5-4.5z"></path><path d="M10.8 8.7 6 10.2l2.5 2M15.3 13.2l-1.5 4.8-2-2.5"></path><circle cx="15" cy="8.9" r="1.3"></circle><path d="M5 19c1-2 3-2.5 4.5-2"></path></svg>',
+    tile:'For power users with <b>heavy uploads and gaming</b>.',
     title:'Our fastest nbn® speed',intro:'~780 Mbps typical evening speed — for big households and serious uploads.',
     checks:['Upload big files fast','Run a smart home full of devices','Want the fastest we offer']}
 };
+const NET_HERO_ICON='<svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#8D39F5" stroke-width="1.9" stroke-linecap="round"><path d="M3.5 9.5a12.5 12.5 0 0 1 17 0"></path><path d="M6.5 12.7a8.2 8.2 0 0 1 11 0"></path><path d="M9.3 15.7a4.2 4.2 0 0 1 5.4 0"></path><circle cx="12" cy="19" r="1.6" fill="#8D39F5" stroke="none"></circle></svg>';
 
 /* ── Money & estimates ──────────────────────────────────────── */
 const HH={
@@ -404,11 +414,12 @@ function heroHTML(lo){
     ['"They handled everything with my old provider. Painless."','Priya, Liverpool']
   ];
   const addrField=`<div style="position:relative">
-    <div style="display:flex;align-items:center;gap:10px;border-radius:30px;padding:13px 18px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.08)">
+    <div style="display:flex;align-items:center;gap:10px;border-radius:32px;padding:8px 8px 8px 20px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.08)">
       <cp-icon name="SearchSolid" size="22"></cp-icon>
-      <input id="addr-input" class="cp-input" placeholder="Enter your address to get started…" autocomplete="off" value="${S.addrValue.replace(/"/g,'&quot;')}" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:16px;color:#232323;padding:0">
+      <input id="addr-input" class="cp-input" placeholder="Enter your address…" autocomplete="off" value="${S.addrValue.replace(/"/g,'&quot;')}" style="flex:1 1 auto;min-width:0;border:0;outline:none;background:transparent;font-family:gordita;font-weight:700;font-size:16px;color:#232323;padding:0">
+      <button data-act="hero-go" id="hero-go" class="cta" style="min-height:46px;padding:0 22px;border-radius:26px;font-size:15px;font-family:gordita;flex-shrink:0;white-space:nowrap">${S.quote.address?'See my plans':'Search'}</button>
     </div>
-    <div id="addr-list" style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:30;display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.12)">${suggestListHTML(S.addrValue)}</div>
+    <div id="addr-list" style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:30;display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.12)">${suggestListHTML(S.quote.address?'':S.addrValue)}</div>
   </div>`;
   const offerCopy=`
     <div class="t15" style="font-weight:500">Electricity, natural gas &amp; internet</div>
@@ -416,13 +427,13 @@ function heroHTML(lo){
     <div class="t15" style="padding-top:12px;color:#232323">Get up to $200 (inc. GST) in bill credits — $100 each for electricity and natural gas. Sign up online and stay until 30 June 2026.</div>
     <div class="t13" style="padding-top:8px;color:#8A7A58">New or moving residents in NSW, SA or VIC only. Not available if you've had a credit for the same fuel and address in the last 12 months. · <span data-modal="credit" class="cp-link">offer details</span></div>`;
   const card=lo.isMobile
-    ?`<div style="background:#FFF0D6;border-radius:28px;padding:26px 22px;display:flex;flex-direction:column;gap:4px">
+    ?`<div style="background:#FFF0D6;border-radius:28px;padding:38px 26px;display:flex;flex-direction:column;gap:4px">
       <div style="display:flex;justify-content:center;padding-bottom:8px"><img src="project/assets/comfy-credits.png" alt="Comfy Credits" style="width:160px;height:auto"></div>
       ${offerCopy}
-      <div style="padding-top:16px">${addrField}</div>
+      <div style="padding-top:24px">${addrField}</div>
     </div>`
-    :`<div style="background:#FFF0D6;border-radius:28px;padding:44px 48px;display:flex;align-items:center;gap:44px">
-      <div style="flex:1 1 auto;min-width:0">${offerCopy}<div style="padding-top:20px;max-width:480px">${addrField}</div></div>
+    :`<div style="background:#FFF0D6;border-radius:28px;padding:64px 56px;display:flex;align-items:center;gap:48px">
+      <div style="flex:1 1 auto;min-width:0">${offerCopy}<div style="padding-top:28px;max-width:520px">${addrField}</div></div>
       <img src="project/assets/comfy-credits.png" alt="Comfy Credits" style="width:280px;height:auto;flex-shrink:0">
     </div>`;
   return`<div style="max-width:${lo.isMobile?640:960}px;margin:0 auto;padding:${lo.isMobile?'20px 16px 64px':'32px 24px 80px'};animation:cpFade .3s ease">
@@ -612,7 +623,7 @@ function netCardHTML(t,lo){
   </div>`;
   return`<div class="rcard" data-plan="${t.id}" style="width:${w}px;border-radius:32px">
   <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
-    <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%"><cp-icon name="Bolt" size="56"></cp-icon>${tag?`<span style="flex-shrink:0;margin-left:-2px;transform:translateY(-18px)">${tag}</span>`:''}</div>
+    <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%">${NET_HERO_ICON}${tag?`<span style="flex-shrink:0;margin-left:-2px;transform:translateY(-18px)">${tag}</span>`:''}</div>
     <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">nbn® ${t.name}</div>
   </div>
   <div data-act="benefit" data-v="${t.id}" style="background:#FFF0D6;border-radius:${lo.isMobile?24:28}px;padding:${lo.isMobile?'22px 22px':'26px 26px'};display:flex;flex-direction:column;gap:10px;cursor:pointer">
@@ -646,6 +657,41 @@ function netCardHTML(t,lo){
   <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
     <button data-act="pick-net" data-v="${t.id}" class="cta t15" style="width:100%">Select plan</button>
     <div style="font-size:14px;line-height:24px;color:#505050;text-align:center">Change plans anytime.<br>No lock-in contracts.</div>
+  </div>
+</div>`;
+}
+/* ── "All plans come with" info section ─────────────────────── */
+function allPlansHTML(lo,kind){
+  const g='#0E7B3D';
+  const seal=`<svg width="52" height="52" viewBox="0 0 48 48" fill="${g}"><path d="M24 3l4.6 3 5.4-.7 2.2 5 5 2.2-.7 5.4 3 4.6-3 4.6.7 5.4-5 2.2-2.2 5-5.4-.7-4.6 3-4.6-3-5.4.7-2.2-5-5-2.2.7-5.4-3-4.6 3-4.6-.7-5.4 5-2.2 2.2-5 5.4.7z"></path><path d="M16.5 24.5 21.5 29.5 32 18.5" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+  const ic={
+    lock:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${g}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 6.7-1.4"></path></svg>`,
+    cycle:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${g}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.5-3.5"></path><path d="M5.5 3.5v4h4"></path><path d="M4 13a8 8 0 0 0 14.5 3.5"></path><path d="M18.5 20.5v-4h-4"></path></svg>`,
+    shield:`<svg width="28" height="28" viewBox="0 0 24 24" fill="${g}"><path d="M12 2.5l7.5 3v6c0 5-3.2 8.5-7.5 10-4.3-1.5-7.5-5-7.5-10v-6z"></path><text x="12" y="14.8" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#fff">$</text></svg>`,
+    headset:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${g}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 13a7.5 7.5 0 0 1 15 0"></path><rect x="3.5" y="13" width="4" height="6" rx="1.6"></rect><rect x="16.5" y="13" width="4" height="6" rx="1.6"></rect><path d="M18.5 19a4 4 0 0 1-4 2.5"></path></svg>`,
+    inf:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${g}" stroke-width="2.2" stroke-linecap="round"><path d="M8 15.5c-2 0-3.5-1.6-3.5-3.5S6 8.5 8 8.5c3.5 0 4.5 7 8 7 2 0 3.5-1.6 3.5-3.5S18 8.5 16 8.5c-3.5 0-4.5 7-8 7z"></path></svg>`
+  };
+  const label=t=>`<span class="t13" style="color:#505050;text-align:center;line-height:20px;text-decoration:underline dotted rgba(0,0,0,.35);text-underline-offset:4px">${t}</span>`;
+  const tile=(icon,t)=>`<div style="background:#F7F7F7;border-radius:24px;padding:22px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;flex:1 1 0;min-width:0">${icon}${label(t)}</div>`;
+  const blobArt=`<svg width="86" height="72" viewBox="0 0 96 80" fill="none"><defs><linearGradient id="apb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF9E1B"></stop><stop offset="1" stop-color="#F05FA4"></stop></linearGradient></defs><circle cx="52" cy="38" r="30" fill="url(#apb)"></circle><circle cx="32" cy="54" r="17" fill="#F05FA4" opacity=".85"></circle><g transform="rotate(-6 48 40)"><rect x="24" y="22" width="48" height="34" rx="5" fill="#fff" stroke="#232323" stroke-width="1.6"></rect><path d="M24 30h48" stroke="#232323" stroke-width="1.6"></path><circle cx="29" cy="26" r="1.2" fill="#232323"></circle><circle cx="33.5" cy="26" r="1.2" fill="#232323"></circle><rect x="58" y="34" width="12" height="12" rx="3" fill="#8D39F5"></rect><path d="M60.5 39.5a5 5 0 0 1 7 0M62.3 41.6a2.6 2.6 0 0 1 3.4 0" stroke="#fff" stroke-width="1.3" stroke-linecap="round" fill="none"></path></g></svg>`;
+  const wide=kind==='elec'
+    ?`<div style="background:#F7F7F7;border-radius:24px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;${lo.isMobile?'':'max-width:480px;margin:0 auto;width:100%'}">
+      ${label('Unlock a $10/month discount on internet')}${blobArt}
+    </div>`
+    :`<div style="background:#F7F7F7;border-radius:24px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;${lo.isMobile?'':'max-width:480px;margin:0 auto;width:100%'}">
+      ${label('Get an eero 6+ modem for $0')}<img src="project/assets/eero.png" alt="" style="width:84px;height:84px;flex-shrink:0">
+    </div>`;
+  const tiles=kind==='elec'
+    ?[tile(ic.lock,'No lock-in or exit fees'),tile(ic.cycle,'Change or cancel plans anytime'),tile(ic.shield,'10 day cooling off period'),tile(ic.headset,'Australian based support')]
+    :[tile(ic.inf,'Unlimited data on all plan speeds'),tile(ic.lock,'Change or cancel plans anytime'),tile(ic.shield,'30-Day Network Guarantee'),tile(ic.headset,'Australian based phone support')];
+  return`<div style="max-width:${lo.isMobile?420:960}px;margin:0 auto;padding:8px 16px 56px">
+  <div style="background:#fff;border-radius:32px;padding:${lo.isMobile?'32px 20px':'44px 40px'};display:flex;flex-direction:column;gap:22px;align-items:center">
+    ${seal}
+    <span style="font-weight:700;font-size:22px;line-height:28px;color:#232323">All plans come with</span>
+    ${kind==='net'?wide:''}
+    <div style="display:${lo.isMobile?'grid':'flex'};${lo.isMobile?'grid-template-columns:1fr 1fr':''};gap:12px;width:100%">${tiles.join('')}</div>
+    ${kind==='elec'?wide:''}
+    ${lo.isMobile?`<button data-act="jump-plans" data-v="car-${kind==='elec'?'elec':'net'}" class="cta t15" style="width:100%">Jump back to plans&nbsp; ↑</button>`:''}
   </div>
 </div>`;
 }
@@ -685,7 +731,8 @@ function elecHTML(lo){
 <div style="max-width:640px;margin:0 auto;padding:20px 16px 8px;animation:cpFade .3s ease">${inner}</div>
 <div style="background:#F7F7F7;margin-top:14px;padding-top:18px">
 ${carouselHTML(lo,'car-elec',plans.map(p=>richCardHTML(p,lo)).join(''),plans.length)}
-<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">No thanks, skip electricity</button></div>
+<div style="text-align:center;padding:14px 16px 24px"><button data-act="skip-product" class="qlink t15">No thanks, skip electricity</button></div>
+${allPlansHTML(lo,'elec')}
 </div>`;
 }
 function gasCardHTML(){
@@ -714,9 +761,7 @@ function gasCardHTML(){
     </div>
     <div style="padding:0 8px;display:flex;flex-direction:column;gap:8px">
       <div>
-        <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323">Single rate</div>
-        <div style="font-size:14px;line-height:24px;color:#232323">on the same account as your electricity</div>
-        <div data-act="est-modal" style="font-weight:700;font-size:16px;line-height:24px;color:#232323;cursor:pointer;padding-top:6px"><span style="text-decoration:underline dotted rgba(0,0,0,.4);text-underline-offset:4px">$${monthly.toLocaleString('en-AU')}/month</span><span style="font-weight:400">*</span></div>
+        <div data-act="est-modal" style="font-weight:700;font-size:16px;line-height:24px;color:#232323;cursor:pointer"><span style="text-decoration:underline dotted rgba(0,0,0,.4);text-underline-offset:4px">$${monthly.toLocaleString('en-AU')}/month</span><span style="font-weight:400">*</span></div>
       </div>
       <div style="font-size:12px;line-height:20px;color:#505050">Estimated for a home using ~${h.mj} MJ yearly on a single gas rate in the ${NETWORK().name} network. Includes GST.</div>
     </div>
@@ -742,17 +787,32 @@ function gasCardHTML(){
   </div>`;
 }
 function lpgCardHTML(){
+  const aud=AUD.lpg;
   const opt=q=>{
     const on=S.lpgQty===q;
-    return`<button data-act="lpg-qty" data-v="${q}" class="q-opt t15${on?' on':''}">
+    return`<button data-act="lpg-qty" data-v="${q}" class="q-opt${on?' on':''}">
       <span>${q} × 45kg bottle${q>1?'s':''}</span>
       <span style="font-weight:700;white-space:nowrap">$${LPG.bottle*q}<span class="t13" style="font-weight:600"> per swap</span></span>
     </button>`;
   };
-  return`<div style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:10px">
-    ${opt(1)}${opt(2)}
-    <div class="t13 mut" style="text-align:center;padding-top:4px">${LPG.note}</div>
-    <button data-act="lpg-add" class="cta t15" style="width:100%;margin-top:6px">Add ${S.lpgQty} bottle${S.lpgQty>1?'s':''} — $${LPG.bottle*S.lpgQty} per swap</button>
+  return`<div style="background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:26px 18px;display:flex;flex-direction:column;gap:16px;max-width:460px;margin:0 auto">
+    <div style="height:64px;display:flex;align-items:center;justify-content:center"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="14" rx="3"></rect><path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h1A1.5 1.5 0 0 1 14 5.5V7"></path><path d="M10 11h4"></path></svg></div>
+    <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">LPG bottles</div>
+    <div data-act="benefit" data-v="lpg" style="background:#FFF0D6;border-radius:24px;padding:22px 22px;display:flex;flex-direction:column;gap:10px;cursor:pointer">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        ${aud.icon}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"></path></svg>
+      </div>
+      <span style="font-size:16px;line-height:24px;color:#232323">${aud.tile}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${opt(1)}${opt(2)}
+    </div>
+    <div style="font-size:12px;line-height:20px;color:#505050;text-align:center">${LPG.note}</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <button data-act="lpg-add" class="cta t15" style="width:100%">Add ${S.lpgQty} bottle${S.lpgQty>1?'s':''} — $${LPG.bottle*S.lpgQty} per swap</button>
+      <div style="font-size:14px;line-height:24px;color:#505050;text-align:center">Change plans anytime.<br>No lock-in contracts.</div>
+    </div>
   </div>`;
 }
 function gaspHTML(lo){
@@ -788,7 +848,8 @@ function netHTML(lo){
 </div>
 <div style="background:#F7F7F7;margin-top:14px;padding-top:18px">
 ${carouselHTML(lo,'car-net',NET_TIERS.map(t=>netCardHTML(t,lo)).join(''),NET_TIERS.length)}
-<div style="text-align:center;padding:14px 16px 64px"><button data-act="skip-product" class="qlink t15">No thanks, skip internet</button></div>
+<div style="text-align:center;padding:14px 16px 24px"><button data-act="skip-product" class="qlink t15">No thanks, skip internet</button></div>
+${allPlansHTML(lo,'net')}
 </div>`;
 }
 
@@ -1243,8 +1304,11 @@ function render(){
       inp.setSelectionRange(inp.value.length,inp.value.length);
       inp.addEventListener('input',e=>{
         S.addrValue=e.target.value;
+        if(S.quote.address&&S.addrValue!==S.quote.address) S.quote.address='';
         const list=document.getElementById('addr-list');
-        if(list) list.innerHTML=suggestListHTML(S.addrValue);
+        if(list) list.innerHTML=suggestListHTML(S.quote.address?'':S.addrValue);
+        const go=document.getElementById('hero-go');
+        if(go) go.textContent=S.quote.address?'See my plans':'Search';
       });
     }
   }
@@ -1256,7 +1320,8 @@ document.addEventListener('click',e=>{
   if(sg){
     S.quote.address=sg.getAttribute('data-suggest');
     S.quote.ces=sg.getAttribute('data-ces')==='1';
-    goStep('q-situation');return;
+    S.addrValue=S.quote.address;
+    render();return;
   }
   const md=e.target.closest('[data-modal]');
   if(md){openModal(md.getAttribute('data-modal'));return;}
@@ -1265,6 +1330,10 @@ document.addEventListener('click',e=>{
   const act=el.getAttribute('data-act'),v=el.getAttribute('data-v');
   switch(act){
     case'step-back':history.back();break;
+    case'hero-go':
+      if(S.quote.address) goStep('q-situation');
+      else{const i=document.getElementById('addr-input');if(i) i.focus();}
+      break;
     case'q-moving':S.quote.moving=v;goStep('services');break;
     case'gas-tab':S.gasTab=v;render();break;
     case'filter':S.filters[v]=!S.filters[v];render();break;
@@ -1302,6 +1371,10 @@ document.addEventListener('click',e=>{
     case'lpg-qty':S.lpgQty=+v;render();break;
     case'lpg-add':S.quote.lpg={qty:S.lpgQty};S.quote.gasPlan=null;goStep(nextAfter('gasp'));maybeUnlock();break;
     case'est-modal':openModal('estimates');break;
+    case'jump-plans':{
+      const row=document.getElementById(v);
+      if(row) window.scrollTo({top:row.getBoundingClientRect().top+window.scrollY-140,behavior:'smooth'});
+      break;}
     case'benefit':S.benefitPlan=v;openModal('benefit');break;
     case'acc-toggle':{
       // One control across all cards: opening a section opens it on
