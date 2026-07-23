@@ -1321,7 +1321,7 @@ document.addEventListener('click',e=>{
     S.quote.address=sg.getAttribute('data-suggest');
     S.quote.ces=sg.getAttribute('data-ces')==='1';
     S.addrValue=S.quote.address;
-    render();return;
+    goStep('q-situation');return;
   }
   const md=e.target.closest('[data-modal]');
   if(md){openModal(md.getAttribute('data-modal'));return;}
