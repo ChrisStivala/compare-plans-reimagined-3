@@ -294,7 +294,7 @@ const S={
   addrValue:'',
   filters:{Solar:false,EV:false,Battery:false},
   gasTab:'gas',unlockShown:false,
-  sf:{step:'details',known:false},
+  sf:{step:'details',known:false,ident:'',fromDetails:false},
   accOpen:null,
   hmc:{step:'have',have:{solar:false,battery:false,ev:false,none:false},solarKw:'6.6',battKwh:'10',evBrand:null,timing:null,shift:null,usage:null,rewards:null},
   recommended:null,
@@ -915,6 +915,8 @@ function quoteHTML(lo){
   ${rows.length?`
   <div style="${riseAt(slot*QSTEP+150)}">
     <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:22px auto 0">
+      <label class="t13" style="font-weight:600;color:#505050;text-align:left">Where should we send your quote?</label>
+      <input id="quote-id" type="text" inputmode="email" placeholder="Email or mobile number" autocomplete="off" value="${(S.sf.ident||'').replace(/"/g,'&quot;')}" style="min-height:52px;border:1.5px solid #C9C9C9;border-radius:26px;padding:0 20px;font-family:gordita;font-size:16px;color:#232323;outline:none;box-sizing:border-box">
       <button data-act="go-signup" class="cta t15" style="width:100%">Continue</button>
       <button data-act="save-quote" class="t15" style="border:1.5px solid #C9C9C9;background:#fff;border-radius:26px;min-height:52px;font-weight:600;cursor:pointer">Save quote</button>
     </div>
@@ -947,8 +949,9 @@ function signupFormHTML(lo){
   let inner='';
   if(step==='details'){
     inner=`
-    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Let's start with your details</h1>
-    <div class="t13 mut" style="padding:0 2px 18px">About 4 minutes — no credit card needed.</div>
+    <h1 class="t28" style="margin:0 0 4px;font-weight:700">Finish your details</h1>
+    <div class="t13 mut" style="padding:0 2px 6px">About 4 minutes — no credit card needed.</div>
+    <div class="t13 mid" style="padding:0 2px 18px">Have an Origin account? <button data-act="sf-login-link" class="qlink t13" style="padding:0">Log in</button> to save a few steps.</div>
     <div style="display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;gap:12px;flex-direction:${lo.isMobile?'column':'row'}">
         ${field('First name','first','text','Jane')}
@@ -962,7 +965,7 @@ function signupFormHTML(lo){
     inner=`
     ${back}
     <h1 class="t28" style="margin:0 0 4px;font-weight:700">Welcome back</h1>
-    <div class="t15 mid" style="padding-bottom:18px">${(S.form.email||'').replace(/</g,'&lt;')}</div>
+    <div class="t15 mid" style="padding-bottom:18px">${(S.sf.ident||S.form.email||'').replace(/</g,'&lt;')}</div>
     <div style="display:flex;flex-direction:column;gap:16px">
       ${field('Password','pw','password','••••••••')}
       <a href="#" class="t13 cp-link" style="color:#505050">Forgot your password?</a>
@@ -1425,7 +1428,16 @@ document.addEventListener('click',e=>{
     case'ev-models':openModal('evModels');break;
     case'hh-set':S.answers.household=v;render();openModal('estimates');break;
     case'edit-step':goStep(v);break;
-    case'go-signup':goStep('signup');break;
+    case'go-signup':{
+      const ident=(S.sf.ident||'').trim();
+      if(!ident){const qi=document.getElementById('quote-id');if(qi) qi.focus();break;}
+      const digits=ident.replace(/\D/g,'');
+      if(ident.includes('@')) S.form.email=ident.toLowerCase();
+      else if(digits) S.form.mobile=ident;
+      S.sf.known=SEEDED.some(a=>ident.toLowerCase()===a.email||(digits.length>=8&&digits===a.mobile));
+      S.sf.fromDetails=false;
+      S.sf.step=S.sf.known?'password':'details';
+      goStep('signup');break;}
     case'save-quote':openModal('savequote');break;
     case'copy-quote':{
       const url=location.origin+location.pathname+'?q='+serializeQuote();
@@ -1438,15 +1450,22 @@ document.addEventListener('click',e=>{
       const em=(S.form.email||'').trim().toLowerCase();
       const mb=(S.form.mobile||'').replace(/\D/g,'');
       S.sf.known=SEEDED.some(a=>em===a.email||(!!mb&&mb===a.mobile));
+      if(S.sf.known){S.sf.fromDetails=true;S.sf.ident=em||S.form.mobile;}
       S.sf.step=S.sf.known?'password':'finish';
       window.scrollTo(0,0);render();break;}
+    case'sf-login-link':
+      S.sf.fromDetails=true;S.sf.ident=S.sf.ident||(S.form.email||S.form.mobile||'');
+      S.sf.step='password';window.scrollTo(0,0);render();break;
     case'sf-login':
       S.form.conc=S.form.conc||'No';S.form.life=S.form.life||'No';
       S.sf.step='finish';window.scrollTo(0,0);render();break;
     case'sf-back':{
-      const order=S.sf.known?['details','password','finish']:['details','finish'];
-      const i=order.indexOf(S.sf.step);
-      if(i>0){S.sf.step=order[i-1];window.scrollTo(0,0);render();}
+      if(S.sf.step==='password'){
+        if(S.sf.fromDetails){S.sf.step='details';window.scrollTo(0,0);render();}
+        else history.back();
+      }else if(S.sf.step==='finish'){
+        S.sf.step=S.sf.known?'password':'details';window.scrollTo(0,0);render();
+      }
       break;}
     case'signup-end':openModal('signupEnd');break;
     case'restart':
@@ -1457,7 +1476,7 @@ document.addEventListener('click',e=>{
       S.recommended=null;
       S.filters={Solar:false,EV:false,Battery:false};
       S.form={first:'',last:'',email:'',mobile:'',conc:null,life:null};
-      S.sf={step:'details',known:false};
+      S.sf={step:'details',known:false,ident:'',fromDetails:false};
       window.scrollTo(0,0);render();break;
   }
 });
@@ -1465,7 +1484,8 @@ document.addEventListener('input',e=>{
   const f=e.target.closest&&e.target.closest('[data-field]');
   if(f){S.form[f.getAttribute('data-field')]=f.value;return;}
   const hm=e.target.closest&&e.target.closest('[data-hmc]');
-  if(hm) S.hmc[hm.getAttribute('data-hmc')]=hm.value;
+  if(hm){S.hmc[hm.getAttribute('data-hmc')]=hm.value;return;}
+  if(e.target.id==='quote-id') S.sf.ident=e.target.value;
 });
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&S.activeModal&&!S.modalClosing) closeModal();
