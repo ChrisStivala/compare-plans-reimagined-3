@@ -512,8 +512,9 @@ const creditPill=(inline)=>`<span style="${inline?'align-self:flex-start;':'posi
 const accRow=(k,v)=>`<div class="t13" style="display:flex;justify-content:space-between;gap:12px;line-height:24px"><span class="mid">${k}</span><span style="color:#232323">${v}</span></div>`;
 function richCardHTML(plan,lo){
   const w=lo.isMobile?300:340;
-  const rec=S.recommended===plan.id?`<span style="position:absolute;top:2px;right:14px;background:#0E7B3D;color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">Recommended for you</span>`:'';
-  const tag=plan.tag?`<span style="position:absolute;top:2px;right:14px;background:${plan.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${plan.tag}</span>`:'';
+  const pillStyle=bg=>`background:${bg};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:16px 16px 16px 5px;border:4px solid #fff;white-space:nowrap`;
+  const rec=S.recommended===plan.id?`<span style="${pillStyle('#0E7B3D')}">Recommended for you</span>`:'';
+  const tag=plan.tag?`<span style="${pillStyle(plan.tagColor)}">${plan.tag}</span>`:'';
   const aud=AUD[plan.id];
   const monthly=Math.round(est(plan,false).cost/12);
   const h=HH[S.answers.household];
@@ -549,7 +550,7 @@ function richCardHTML(plan,lo){
     <div class="t13 mut" style="padding-top:12px;line-height:20px">All rates are variable, rounded to 2 decimal places and inclusive of GST. Concessions are not included.</div>`;
   return`<div class="rcard" data-plan="${plan.id}" style="width:${w}px;border-radius:32px">
   <div style="display:flex;flex-direction:column;gap:14px;align-items:center;position:relative">
-    <div style="height:96px;display:flex;align-items:center;justify-content:center;width:100%;position:relative">${picto(plan,92)}${rec||tag}</div>
+    <div style="height:96px;display:flex;align-items:center;justify-content:center;width:100%">${picto(plan,92)}${(rec||tag)?`<span style="flex-shrink:0;margin-left:-6px;transform:translateY(-26px)">${rec||tag}</span>`:''}</div>
     <div style="font-weight:700;font-size:16px;line-height:24px;color:#232323;text-align:center">${plan.name.replace('Origin ','')}</div>
   </div>
   <div data-act="benefit" data-v="${plan.id}" style="background:#FFF0D6;border-radius:${lo.isMobile?24:28}px;padding:${lo.isMobile?'22px 22px':'26px 26px'};display:flex;flex-direction:column;gap:10px;cursor:pointer">
@@ -579,10 +580,10 @@ function richCardHTML(plan,lo){
 }
 function netCardHTML(t,lo){
   const w=lo.isMobile?300:340;
-  const tag=t.tag?`<span style="position:absolute;top:2px;right:14px;background:${t.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:14px 14px 14px 4px;white-space:nowrap">${t.tag}</span>`:'';
+  const tag=t.tag?`<span style="background:${t.tagColor};color:#fff;font-weight:700;font-size:12.5px;line-height:18px;padding:5px 11px;border-radius:16px 16px 16px 5px;border:4px solid #fff;white-space:nowrap">${t.tag}</span>`:'';
   return`<div class="rcard" style="width:${w}px">
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;position:relative">
-    <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%;position:relative"><cp-icon name="Bolt" size="56"></cp-icon>${tag}</div>
+    <div style="height:72px;display:flex;align-items:center;justify-content:center;width:100%"><cp-icon name="Bolt" size="56"></cp-icon>${tag?`<span style="flex-shrink:0;margin-left:-2px;transform:translateY(-18px)">${tag}</span>`:''}</div>
     <div style="text-align:center;padding:0 6px">
       <div style="font-weight:700;font-size:16px;line-height:23px;color:#232323">nbn® ${t.name}</div>
       <div class="t13 mid" style="min-height:40px">${t.best}</div>
